@@ -1,0 +1,1200 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interview System</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --sidebar-w: 230px;
+        --bg: #fff0f5;
+        --sidebar-bg: #2b1a24;
+        --sidebar-hover: #3a2430;
+        --sidebar-active: #4a2d3d;
+        --accent: #ff4f8b;
+        --accent-soft: #fff0f5;
+        --text-main: #2a1a22;
+        --text-muted: #a07a8c;
+        --card-bg: #ffffff;
+        --border: #f3d6e2;
+        --danger: #ef4444;
+        --success: #10b981;
+        --info: #4f7ef8;
+        --transition: 0.18s ease;
+      }
+
+      body {
+        font-family: "DM Sans", sans-serif;
+        background: var(--bg);
+        display: flex;
+        min-height: 100vh;
+        color: var(--text-main);
+      }
+
+      /* ── Sidebar ── */
+      .sidebar {
+        width: var(--sidebar-w);
+        min-height: 100vh;
+        background: var(--sidebar-bg);
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 100;
+      }
+      .sidebar-logo {
+        padding: 24px 20px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      .sidebar-logo h2 {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .logo-icon {
+        width: 32px;
+        height: 32px;
+        background: var(--accent);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+      }
+      .sidebar-nav {
+        flex: 1;
+        padding: 16px 12px;
+      }
+      .nav-label {
+        font-size: 10px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.3);
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        padding: 0 8px;
+        margin-bottom: 8px;
+        margin-top: 16px;
+      }
+      .nav-label:first-child {
+        margin-top: 0;
+      }
+      .sidebar ul {
+        list-style: none;
+      }
+      .sidebar li {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.55);
+        transition: var(--transition);
+        margin-bottom: 2px;
+        position: relative;
+      }
+      .sidebar li:hover {
+        background: var(--sidebar-hover);
+        color: rgba(255, 255, 255, 0.85);
+      }
+      .sidebar li.active {
+        background: var(--sidebar-active);
+        color: #fff;
+      }
+      .sidebar li.active::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3px;
+        height: 60%;
+        background: var(--accent);
+        border-radius: 0 3px 3px 0;
+      }
+      .nav-icon {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+        opacity: 0.7;
+      }
+      .sidebar li.active .nav-icon,
+      .sidebar li:hover .nav-icon {
+        opacity: 1;
+      }
+      .sidebar-footer {
+        padding: 16px 12px;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+      }
+      .user-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px;
+        border-radius: 8px;
+      }
+      .avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #4f7ef8, #38c98a);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 600;
+        color: white;
+        flex-shrink: 0;
+      }
+      .user-name {
+        font-size: 13px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.85);
+      }
+      .user-role {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.35);
+      }
+
+      /* ── Main ── */
+      .main {
+        margin-left: var(--sidebar-w);
+        flex: 1;
+        padding: 30px;
+      }
+      .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+      }
+      .page-header h1 {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 24px;
+        font-weight: 700;
+      }
+
+      .btn-add {
+        background: var(--accent);
+        color: white;
+        border: none;
+        padding: 10px 18px;
+        border-radius: 9px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        transition: var(--transition);
+        box-shadow: 0 4px 14px rgba(255, 79, 139, 0.35);
+      }
+      .btn-add:hover {
+        background: #e84379;
+        transform: translateY(-1px);
+        box-shadow: 0 6px 18px rgba(255, 79, 139, 0.45);
+      }
+
+      /* ── Interview Cards ── */
+      .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        gap: 14px;
+        margin-bottom: 28px;
+      }
+
+      .interview-card {
+        background: white;
+        border: 2px solid var(--border);
+        border-radius: 16px;
+        padding: 18px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+      }
+      .interview-card::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: var(--accent);
+        border-radius: 4px 0 0 4px;
+        transform: scaleY(0);
+        transition: transform 0.2s ease;
+      }
+      .interview-card:hover {
+        border-color: var(--accent);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(255, 79, 139, 0.12);
+      }
+      .interview-card:hover::before {
+        transform: scaleY(1);
+      }
+      .interview-card.selected {
+        border-color: var(--accent);
+        background: #fff5f9;
+        box-shadow: 0 6px 20px rgba(255, 79, 139, 0.15);
+      }
+      .interview-card.selected::before {
+        transform: scaleY(1);
+      }
+
+      .ic-name {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 6px;
+      }
+      .ic-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-size: 11px;
+        background: #fff0f5;
+        color: var(--accent);
+        border-radius: 20px;
+        padding: 2px 8px;
+        margin-top: 8px;
+        font-weight: 500;
+      }
+      .ic-actions {
+        display: flex;
+        gap: 6px;
+        margin-top: 12px;
+      }
+      .btn-icon {
+        border: none;
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        transition: var(--transition);
+      }
+      .btn-icon-del {
+        background: #fef2f2;
+        color: var(--danger);
+      }
+      .btn-icon-del:hover {
+        background: var(--danger);
+        color: white;
+      }
+
+      /* ── Detail Panel ── */
+      .detail-panel {
+        background: white;
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        overflow: hidden;
+        animation: fadeIn 0.2s ease;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .detail-header {
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: linear-gradient(135deg, #fff5f9 0%, #fff 100%);
+      }
+      .detail-title {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+      }
+      .detail-subtitle {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-top: 2px;
+      }
+      .btn-add-slot {
+        background: var(--accent);
+        color: white;
+        border: none;
+        padding: 8px 14px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 13px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        transition: var(--transition);
+      }
+      .btn-add-slot:hover {
+        background: #e84379;
+      }
+
+      .empty-state {
+        padding: 48px 24px;
+        text-align: center;
+        color: var(--text-muted);
+      }
+      .empty-state .empty-icon {
+        font-size: 36px;
+        margin-bottom: 12px;
+      }
+      .empty-state p {
+        font-size: 14px;
+      }
+
+      .placeholder-state {
+        padding: 48px 24px;
+        text-align: center;
+        color: var(--text-muted);
+      }
+      .placeholder-state .ph-icon {
+        font-size: 40px;
+        margin-bottom: 12px;
+      }
+
+      /* ── Slots Table ── */
+      .table-wrap {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th {
+        width: 42.3%;
+        padding: 11px 16px;
+        text-align: left;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        background: #fdf2f6;
+        border-bottom: 1px solid var(--border);
+      }
+      td {
+        padding: 13px 16px;
+        font-size: 14px;
+        border-bottom: 1px solid #f9edf3;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      tr:hover td {
+        background: #fff8fb;
+      }
+      .slot-actions {
+        display: flex;
+        gap: 5px;
+      }
+      .btn-slot-edit {
+        background: #eef2ff;
+        color: var(--info);
+        border: none;
+        padding: 5px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        transition: var(--transition);
+      }
+      .btn-slot-edit:hover {
+        background: var(--info);
+        color: white;
+      }
+      .btn-slot-del {
+        background: #fef2f2;
+        color: var(--danger);
+        border: none;
+        padding: 5px 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 12px;
+        transition: var(--transition);
+      }
+      .btn-slot-del:hover {
+        background: var(--danger);
+        color: white;
+      }
+
+      /* ── Modal ── */
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(43, 26, 36, 0.45);
+        backdrop-filter: blur(4px);
+        align-items: center;
+        justify-content: center;
+        z-index: 200;
+      }
+      .modal-overlay.open {
+        display: flex;
+      }
+      .modal {
+        background: white;
+        padding: 28px;
+        border-radius: 18px;
+        width: 420px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        animation: modalIn 0.2s ease;
+      }
+      @keyframes modalIn {
+        from {
+          opacity: 0;
+          transform: scale(0.95) translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+      .modal-title {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      .modal-subtitle {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-bottom: 20px;
+      }
+      .form-group {
+        margin-bottom: 14px;
+      }
+      .form-group label {
+        display: block;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.4px;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+        text-transform: uppercase;
+      }
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1.5px solid var(--border);
+        border-radius: 9px;
+        font-family: inherit;
+        font-size: 14px;
+        color: var(--text-main);
+        transition: var(--transition);
+        outline: none;
+        background: white;
+      }
+      .form-group input:focus,
+      .form-group select:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px rgba(255, 79, 139, 0.1);
+      }
+      .modal-footer {
+        margin-top: 20px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+      }
+      .btn-save {
+        background: var(--accent);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 9px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: var(--transition);
+      }
+      .btn-save:hover {
+        background: #e84379;
+      }
+      .btn-save:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      .btn-cancel {
+        background: #f5f5f5;
+        color: #555;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 9px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: var(--transition);
+      }
+      .btn-cancel:hover {
+        background: #eee;
+      }
+
+      /* ── Confirm Modal ── */
+      .confirm-modal {
+        background: white;
+        padding: 28px;
+        border-radius: 18px;
+        width: 360px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        animation: modalIn 0.2s ease;
+        text-align: center;
+      }
+      .confirm-icon {
+        font-size: 40px;
+        margin-bottom: 12px;
+      }
+      .confirm-title {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 17px;
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+      .confirm-msg {
+        font-size: 14px;
+        color: var(--text-muted);
+        margin-bottom: 22px;
+      }
+      .confirm-btns {
+        display: flex;
+        gap: 8px;
+        justify-content: center;
+      }
+      .btn-danger {
+        background: var(--danger);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 9px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        transition: var(--transition);
+      }
+      .btn-danger:hover {
+        background: #dc2626;
+      }
+
+      /* Toast */
+      .toast {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: #1e1e2e;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        z-index: 999;
+        animation: toastIn 0.3s ease;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+      }
+      @keyframes toastIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <div class="sidebar-logo">
+        <h2>
+          <div class="logo-icon">⚡</div>
+          System
+        </h2>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-label">Main</div>
+        <ul>
+          <li onclick="window.location.href = 'index.html'">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor">
+              <path
+                d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z"
+              />
+            </svg>
+            Dashboard
+          </li>
+        </ul>
+        <div class="nav-label">Management</div>
+        <ul>
+          <li onclick="window.location.href = 'staff.html'">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor">
+              <path
+                d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"
+              />
+            </svg>
+            Staff
+          </li>
+          <li onclick="window.location.href = 'volunteers.html'">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor">
+              <path
+                fill-rule="evenodd"
+                d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            Volunteers
+          </li>
+          <li class="active">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor">
+              <path
+                fill-rule="evenodd"
+                d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            Interview
+          </li>
+        </ul>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <div class="avatar">A</div>
+          <div>
+            <div class="user-name">Admin</div>
+            <div class="user-role">System Manager</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main -->
+    <div class="main">
+      <div class="page-header">
+        <h1>Interviews</h1>
+        <button class="btn-add" onclick="openInterviewModal()">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path
+              d="M7 1v12M1 7h12"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+            />
+          </svg>
+          Add Interview
+        </button>
+      </div>
+      <div class="cards-grid" id="cards-grid"></div>
+      <div id="detail-panel"></div>
+    </div>
+
+    <!-- Interview Modal -->
+    <div class="modal-overlay" id="interview-modal">
+      <div class="modal">
+        <div class="modal-title">New Interview</div>
+        <div class="modal-subtitle">
+          Enter a name for this interview session
+        </div>
+        <div class="form-group">
+          <label>Interview Name</label>
+          <input type="text" id="f-name" placeholder="e.g. interview 1" />
+        </div>
+        <div class="modal-footer">
+          <button class="btn-cancel" onclick="closeModal('interview-modal')">
+            Cancel
+          </button>
+          <button
+            class="btn-save"
+            id="btn-save-interview"
+            onclick="saveInterview()"
+          >
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slot Modal -->
+    <div class="modal-overlay" id="slot-modal">
+      <div class="modal">
+        <div class="modal-title" id="slot-modal-title">Add Slot</div>
+        <div class="modal-subtitle">
+          Fill in the details for this interview slot
+        </div>
+        <div class="form-group">
+          <label>Date</label>
+          <input type="date" id="s-date" />
+        </div>
+        <div class="form-group">
+          <label>Time</label>
+          <input type="time" id="s-time" />
+        </div>
+        <div class="modal-footer">
+          <button class="btn-cancel" onclick="closeModal('slot-modal')">
+            Cancel
+          </button>
+          <button class="btn-save" id="btn-save-slot" onclick="saveSlot()">
+            Save Slot
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div class="modal-overlay" id="confirm-modal">
+      <div class="confirm-modal">
+        <div class="confirm-icon"></div>
+        <div class="confirm-title" id="confirm-title">Are you sure?</div>
+        <div class="confirm-msg" id="confirm-msg">
+          This action cannot be undone.
+        </div>
+        <div class="confirm-btns">
+          <button class="btn-cancel" onclick="closeModal('confirm-modal')">
+            Cancel
+          </button>
+          <button class="btn-danger" id="confirm-yes">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // ── Auth ──
+      var hr = localStorage.getItem("user");
+      var hrId = 1;
+      if (hr) {
+        try {
+          hr = JSON.parse(hr);
+          hrId = hr.id;
+          if (hr.role !== "HR_ADMIN") window.location.href = "login.html";
+        } catch (e) {}
+      }
+
+      // ── State ──
+      let data = [];
+      let selectedId = null;
+      // null  = we are adding a new slot
+      // a value = we are editing that slot (stored as whatever type server returns)
+      let editingSlotId = null;
+
+      // ── ID comparison (safe for number vs string) ──
+      function sameId(a, b) {
+        return a != null && b != null && String(a) === String(b);
+      }
+
+      // ── API ──
+      async function getInterviews() {
+        const res = await fetch(`http://localhost:9090/interviews/${hrId}`);
+        if (!res.ok) throw new Error(`GET /interviews failed: ${res.status}`);
+        data = await res.json();
+        render();
+      }
+
+      async function apiCreateInterview(name) {
+        const res = await fetch(
+          `http://localhost:9090/create-interview/${hrId}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name }),
+          },
+        );
+        if (!res.ok) throw new Error(`Create interview failed: ${res.status}`);
+        await getInterviews();
+      }
+
+      async function apiDeleteInterview(id) {
+        const res = await fetch(
+          `http://localhost:9090/interviews/${hrId}/${id}`,
+          {
+            method: "DELETE",
+          },
+        );
+        if (!res.ok) throw new Error(`Delete interview failed: ${res.status}`);
+        if (sameId(selectedId, id)) selectedId = null;
+        await getInterviews();
+      }
+
+      // POST /interview/{interviewId}/slots  body: { date, time, hrId, interviewId }
+      async function apiCreateSlot(interviewId, slotDate, slotTime) {
+        const body = { slotDate, slotTime, hrId, interviewId };
+        const res = await fetch(
+          `http://localhost:9090/interview/${interviewId}/slots`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          },
+        );
+        if (!res.ok) throw new Error(`Create slot failed: ${res.status}`);
+        await getInterviews();
+      }
+
+      // PUT /slots/{hrId}/{slotId}  body: { date, time, hrId, interviewId }
+      async function apiUpdateSlot(slotId, slotDate, slotTime) {
+        const body = { slotDate, slotTime };
+        const res = await fetch(
+          `http://localhost:9090/slots/${hrId}/${slotId}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          },
+        );
+        if (!res.ok) throw new Error(`Update slot failed: ${res.status}`);
+        await getInterviews();
+      }
+
+      // DELETE /slots/{hrId}/{slotId}
+      async function apiDeleteSlot(slotId) {
+        const res = await fetch(
+          `http://localhost:9090/slots/${hrId}/${slotId}`,
+          {
+            method: "DELETE",
+          },
+        );
+        if (!res.ok) throw new Error(`Delete slot failed: ${res.status}`);
+        await getInterviews();
+      }
+
+      // ── Render ──
+      function render() {
+        renderCards();
+        renderDetail();
+      }
+
+      function renderCards() {
+        const grid = document.getElementById("cards-grid");
+        if (!data.length) {
+          grid.innerHTML = `<div style="color:var(--text-muted);font-size:14px;grid-column:1/-1;padding:20px 0;">No interviews yet. Click "Add Interview" to create one.</div>`;
+          return;
+        }
+        grid.innerHTML = data
+          .map((s) => {
+            const count = (s.slots || []).length;
+            return `
+            <div class="interview-card ${sameId(selectedId, s.id) ? "selected" : ""}" onclick="selectInterview(${s.id})">
+              <div class="ic-name">${s.name || "Untitled"}</div>
+              <div class="ic-badge">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor"><circle cx="5" cy="5" r="4"/></svg>
+                ${count} slot${count !== 1 ? "s" : ""}
+              </div>
+              <div class="ic-actions" onclick="event.stopPropagation()">
+                <button class="btn-icon btn-icon-del" title="Delete interview" onclick="confirmDeleteInterview(${s.id})">🗑</button>
+              </div>
+            </div>`;
+          })
+          .join("");
+      }
+
+      function renderDetail() {
+        const panel = document.getElementById("detail-panel");
+        if (!selectedId) {
+          panel.innerHTML = `
+            <div class="detail-panel">
+              <div class="placeholder-state">
+                <div class="ph-icon"></div>
+                <p style="font-size:15px;font-weight:500;margin-bottom:6px;">Select an interview</p>
+                <p>Click any interview card above to view and manage its slots.</p>
+              </div>
+            </div>`;
+          return;
+        }
+
+        const interview = data.find((x) => sameId(x.id, selectedId));
+        if (!interview) {
+          selectedId = null;
+          renderDetail();
+          return;
+        }
+
+        const slots = interview.slots || [];
+        panel.innerHTML = `
+          <div class="detail-panel">
+            <div class="detail-header">
+              <div>
+                <div class="detail-title">${interview.name}</div>
+                <div class="detail-subtitle">${slots.length} slot${slots.length !== 1 ? "s" : ""} scheduled</div>
+              </div>
+              <button class="btn-add-slot" onclick="openSlotModal(null)">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v10M1 6h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                Add Slot
+              </button>
+            </div>
+            ${
+              slots.length === 0
+                ? `
+              <div class="empty-state">
+                <div class="empty-icon"></div>
+                <p style="font-size:15px;font-weight:500;margin-bottom:6px;">No slots yet</p>
+                <p>Click "Add Slot" to schedule interview time slots.</p>
+              </div>
+            `
+                : `
+              <div class="table-wrap">
+                <table>
+                  <thead><tr><th>Date</th><th>Time</th><th>Actions</th></tr></thead>
+                  <tbody>
+                    ${slots
+                      .map(
+                        (slot) => `
+                      <tr>
+                        <td>${formatDate(slot.date)}</td>
+                        <td>${formatTime(slot.time)}</td>
+                        <td>
+                          <div class="slot-actions">
+                            <button class="btn-slot-edit" onclick="openSlotModal('${slot.id}')">✏️ Edit</button>
+                            <button class="btn-slot-del" onclick="confirmDeleteSlot('${slot.id}')">🗑 Delete</button>
+                          </div>
+                        </td>
+                      </tr>`,
+                      )
+                      .join("")}
+                  </tbody>
+                </table>
+              </div>
+            `
+            }
+          </div>`;
+      }
+
+      function formatDate(d) {
+        if (!d) return "-";
+        try {
+          return new Date(d + "T00:00:00").toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+            year: "numeric",
+          });
+        } catch {
+          return d;
+        }
+      }
+
+      function formatTime(t) {
+        if (!t) return "-";
+        try {
+          const [h, m] = t.split(":");
+          const dt = new Date();
+          dt.setHours(+h, +m, 0);
+          return dt.toLocaleTimeString("en-US", {
+            hour: "numeric",
+            minute: "2-digit",
+            hour12: true,
+          });
+        } catch {
+          return t;
+        }
+      }
+
+      // ── Select ──
+      function selectInterview(id) {
+        selectedId = sameId(selectedId, id) ? null : id;
+        render();
+      }
+
+      // ── Interview Modal ──
+      function openInterviewModal() {
+        document.getElementById("f-name").value = "";
+        const btn = document.getElementById("btn-save-interview");
+        btn.disabled = false;
+        btn.textContent = "Save";
+        document.getElementById("interview-modal").classList.add("open");
+        setTimeout(() => document.getElementById("f-name").focus(), 80);
+      }
+
+      async function saveInterview() {
+        const name = document.getElementById("f-name").value.trim();
+        if (!name) {
+          showToast(" Please enter a name");
+          return;
+        }
+        const btn = document.getElementById("btn-save-interview");
+        btn.disabled = true;
+        btn.textContent = "Saving…";
+        try {
+          await apiCreateInterview(name);
+          closeModal("interview-modal");
+          showToast(" Interview created");
+        } catch (e) {
+          showToast(" " + e.message);
+          btn.disabled = false;
+          btn.textContent = "Save";
+        }
+      }
+
+      // ── Slot Modal ──
+      // slotId is the raw server ID (string or number), or null for a new slot
+      function openSlotModal(slotId) {
+        setMinDateTomorrow();
+        // Always reset first
+        editingSlotId = null;
+        document.getElementById("s-date").value = "";
+        document.getElementById("s-time").value = "";
+        const btn = document.getElementById("btn-save-slot");
+        btn.disabled = false;
+        btn.textContent = "Save Slot";
+
+        if (slotId !== null && slotId !== undefined && slotId !== "null") {
+          // Editing an existing slot — find it in local data
+          const interview = data.find((x) => sameId(x.id, selectedId));
+          if (!interview) {
+            showToast(" Interview not found");
+            return;
+          }
+
+          const slot = (interview.slots || []).find((s) =>
+            sameId(s.id, slotId),
+          );
+          if (!slot) {
+            showToast(" Slot not found");
+            return;
+          }
+
+          // Store the exact server ID value so we send it back correctly
+          editingSlotId = slot.id;
+          document.getElementById("s-date").value = slot.date || "";
+          document.getElementById("s-time").value = slot.time || "";
+          document.getElementById("slot-modal-title").textContent = "Edit Slot";
+        } else {
+          document.getElementById("slot-modal-title").textContent = "Add Slot";
+        }
+
+        document.getElementById("slot-modal").classList.add("open");
+        setTimeout(() => document.getElementById("s-date").focus(), 80);
+      }
+
+      async function saveSlot() {
+        const date = document.getElementById("s-date").value;
+        const time = document.getElementById("s-time").value;
+        if (!date) {
+          showToast(" Please select a date");
+          return;
+        }
+        if (!time) {
+          showToast(" Please select a time");
+          return;
+        }
+
+        const btn = document.getElementById("btn-save-slot");
+        btn.disabled = true;
+        btn.textContent = "Saving…";
+
+        try {
+          if (editingSlotId !== null) {
+            // UPDATE existing slot
+            await apiUpdateSlot(editingSlotId, date, time);
+            showToast(" Slot updated");
+          } else {
+            // CREATE new slot
+            await apiCreateSlot(selectedId, date, time);
+            showToast(" Slot added");
+          }
+          closeModal("slot-modal");
+        } catch (e) {
+          showToast(" " + e.message);
+          btn.disabled = false;
+          btn.textContent = "Save Slot";
+        }
+      }
+
+      // ── Confirm Delete ──
+      function confirmDeleteInterview(id) {
+        const interview = data.find((x) => sameId(x.id, id));
+        document.getElementById("confirm-title").textContent =
+          `Delete "${interview?.name}"?`;
+        document.getElementById("confirm-msg").textContent =
+          "This will permanently delete the interview and all its slots.";
+        document.getElementById("confirm-yes").onclick = async () => {
+          closeModal("confirm-modal");
+          try {
+            await apiDeleteInterview(id);
+            showToast(" Interview deleted");
+          } catch (e) {
+            showToast(" " + e.message);
+          }
+        };
+        document.getElementById("confirm-modal").classList.add("open");
+      }
+
+      function confirmDeleteSlot(slotId) {
+        document.getElementById("confirm-title").textContent =
+          "Delete this slot?";
+        document.getElementById("confirm-msg").textContent =
+          "This slot will be permanently removed.";
+        document.getElementById("confirm-yes").onclick = async () => {
+          closeModal("confirm-modal");
+          try {
+            await apiDeleteSlot(slotId);
+            showToast(" Slot deleted");
+          } catch (e) {
+            showToast(" " + e.message);
+          }
+        };
+        document.getElementById("confirm-modal").classList.add("open");
+      }
+
+      function closeModal(id) {
+        document.getElementById(id).classList.remove("open");
+        if (id === "slot-modal") editingSlotId = null;
+      }
+
+      // ── Toast ──
+      function showToast(msg) {
+        const t = document.createElement("div");
+        t.className = "toast";
+        t.textContent = msg;
+        document.body.appendChild(t);
+        setTimeout(() => t.remove(), 3000);
+      }
+
+      // ── Init ──
+      getInterviews().catch((e) => {
+        console.error("Initial load failed:", e);
+        showToast(" Could not connect to server");
+        render();
+      });
+      function setMinDateTomorrow() {
+        const today = new Date();
+
+        // add 1 day → tomorrow
+        today.setDate(today.getDate() + 1);
+
+        // format YYYY-MM-DD
+        const minDate = today.toISOString().split("T")[0];
+
+        document.getElementById("s-date").setAttribute("min", minDate);
+      }
+    </script>
+  </body>
+</html>

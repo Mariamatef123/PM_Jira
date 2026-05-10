@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PR Admin - Campaigns</title>
+    <link rel="stylesheet" href="CSS/style3.css" />
+    <style>
+      .btn-edit,
+      .btn-del {
+        border: none;
+        border-radius: 7px;
+        padding: 6px 12px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        font-family: "DM Sans", sans-serif;
+        transition: var(--transition);
+      }
+
+      .btn-edit {
+        background: #eef2ff;
+        color: #4f7ef8;
+      }
+      .btn-edit:hover {
+        background: #dde5ff;
+      }
+      .btn-del {
+        background: #fdecea;
+        color: #c0392b;
+      }
+      .btn-del:hover {
+        background: #fbd5d2;
+      }
+      .toast {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 12px 18px;
+        border-radius: 10px;
+        font-family: "DM Sans", sans-serif;
+        font-size: 14px;
+        color: #fff;
+        background: #4f7ef8;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.3s ease;
+        z-index: 9999;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .toast.success {
+        background: #22c55e;
+      }
+
+      .toast.error {
+        background: #ef4444;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="main">
+      <div class="page-header">
+        <div>
+          <p class="eyebrow">PR Admin</p>
+          <h1>Campaigns</h1>
+          <p class="page-subtitle">
+            Manage campaigns, locations, and dates for all users.
+          </p>
+        </div>
+
+        <button
+          class="btn btn-add"
+          type="button"
+          id="add-campaign-btn"
+          onclick="openModal()"
+        >
+          <span>+</span>
+          <span>Add Campaign</span>
+        </button>
+      </div>
+
+      <div class="summary-grid">
+        <div class="summary-card">
+          <span class="summary-label">Total Campaigns</span>
+          <strong id="total-campaigns">0</strong>
+        </div>
+
+        <div class="summary-card">
+          <span class="summary-label">Completed</span>
+          <strong id="done-campaigns">0</strong>
+        </div>
+      </div>
+      <div class="cards-container" id="campaign-cards"></div>
+      <div class="table-wrap">
+        <div class="table-header">
+          <div>
+            <h2>Campaign Schedule</h2>
+            <p>Visible for admins and can be published for all users.</p>
+          </div>
+        </div>
+
+        <div id="campaign-cards" class="cards-grid"></div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Campaign</th>
+              <th>Location</th>
+              <th>Description</th>
+              <th>Date</th>
+
+              <th id="action">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="campaign-tbody"></tbody>
+        </table>
+
+        <div class="empty-state" id="empty-state">
+          <h3>No campaigns found</h3>
+          <p>
+            Add a campaign so the admin and users can see where it is and when
+            it starts.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-overlay" id="modal-overlay">
+      <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="modal-title-text"
+      >
+        <div class="modal-title">
+          <span id="modal-title-text">Add Campaign</span>
+          <button
+            class="modal-close"
+            id="modal-close-btn"
+            type="button"
+            onclick="closeModal()"
+          >
+            x
+          </button>
+        </div>
+
+        <div class="form-grid">
+          <div class="form-row full">
+            <label for="c-name">Campaign Name</label>
+            <input type="text" id="c-name" placeholder="Enter campaign name" />
+          </div>
+
+          <div class="form-row full">
+            <label for="c-location">Location</label>
+            <input type="text" id="c-location" placeholder="Enter location" />
+          </div>
+
+          <div class="form-row">
+            <label for="c-date">Date</label>
+            <input type="date" id="c-date" />
+          </div>
+
+          <div class="form-row full">
+            <label for="c-description">Description</label>
+            <textarea
+              id="c-description"
+              placeholder="Enter campaign description"
+            ></textarea>
+          </div>
+        </div>
+
+        <p class="helper-text">the data prefered arabic</p>
+
+        <div class="modal-footer">
+          <button
+            class="btn btn-cancel"
+            id="cancel-btn"
+            type="button"
+            onclick="closeModal()"
+          >
+            Cancel
+          </button>
+          <button class="btn btn-save" id="save-btn" type="button">
+            Save Campaign
+          </button>
+        </div>
+      </div>
+    </div>
+    <div id="confirm-modal" class="modal-overlay" style="display: none">
+      <div class="modal">
+        <div class="modal-title">
+          <span>Confirm Delete</span>
+        </div>
+
+        <p style="padding: 10px 0; font-size: 14px">
+          Are you sure you want to delete this campaign?
+        </p>
+
+        <div class="modal-footer">
+          <button class="btn btn-cancel" onclick="closeConfirm()">
+            Cancel
+          </button>
+          <button class="btn btn-del" id="confirm-delete-btn">Delete</button>
+        </div>
+      </div>
+    </div>
+    <div id="toast" class="toast"></div>
+    <script src="JS/script3.js"></script>
+  </body>
+  <script>
+    var pr = localStorage.getItem("user");
+    if (pr) {
+      pr = JSON.parse(pr);
+      var name = pr.name;
+      var prId = pr.id;
+      if (pr.role != "PR_ADMIN") {
+        window.location.href = "login.html";
+      }
+    }
+    // ================= MODAL =================
+    // FIX 5: openModal and closeModal are now properly defined
+
+    function openModal() {
+      // Reset to "Add" mode
+      document.getElementById("modal-title-text").textContent = "Add Campaign";
+      document.getElementById("c-name").value = "";
+      document.getElementById("c-location").value = "";
+      document.getElementById("c-date").value = "";
+      document.getElementById("c-description").value = "";
+
+      // Reset save button to addCampaign
+      var saveBtn = document.getElementById("save-btn");
+      saveBtn.onclick = addCampaign;
+
+      document.getElementById("modal-overlay").style.display = "flex";
+    }
+
+    function closeModal() {
+      // FIX 6: Hide via style.display (matches how it's shown), not class toggling
+      document.getElementById("modal-overlay").style.display = "none";
+    }
+
+    // ================= FETCH =================
+    async function fetchCampaigns() {
+      try {
+        const response = await fetch("http://localhost:9090/campaigns");
+        if (!response.ok) throw new Error("Failed to fetch campaigns");
+        const data = await response.json();
+        renderCampaigns(data);
+      } catch (error) {
+        console.error("Error fetching campaigns:", error);
+        showToast("Error loading campaigns", "error");
+      }
+    }
+
+    // ================= RENDER =================
+    function renderCampaigns(campaigns) {
+      const tbody = document.getElementById("campaign-tbody");
+      const cardsContainer = document.getElementById("campaign-cards");
+      const totalElem = document.getElementById("total-campaigns");
+      const doneElem = document.getElementById("done-campaigns");
+      const emptyState = document.getElementById("empty-state");
+
+      tbody.innerHTML = "";
+      cardsContainer.innerHTML = "";
+
+      if (campaigns.length === 0) {
+        emptyState.style.display = "block";
+        totalElem.textContent = "0";
+        doneElem.textContent = "0";
+        return;
+      }
+
+      emptyState.style.display = "none";
+
+      let doneCount = 0;
+
+      campaigns.forEach((campaign) => {
+        const dateStr = campaign.date
+          ? new Date(campaign.date).toLocaleDateString()
+          : "";
+
+        // Table row
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${campaign.title}</td>
+            <td>${campaign.location}</td>
+           
+             <td>${campaign.description || ""}</td>
+            <td>${dateStr}</td>
+            <td>
+              <button class="btn-edit" onclick="editCampaign(${campaign.id})">Edit</button>
+              <button class="btn-del" onclick="openConfirm(${campaign.id})">Delete</button>
+            </td>
+          `;
+        tbody.appendChild(tr);
+
+        // Card
+        const card = document.createElement("div");
+        card.className = "campaign-card";
+        card.innerHTML = `
+            <h3>${campaign.title}</h3>
+            <p><strong>Location:</strong> ${campaign.location}</p>
+            <p><strong>Date:</strong> ${dateStr}</p>
+            <p><strong>Description:</strong> ${campaign.description || ""}</p>
+          `;
+        cardsContainer.appendChild(card);
+
+        if (campaign.date && new Date(campaign.date) < new Date()) {
+          doneCount++;
+        }
+      });
+
+      totalElem.textContent = campaigns.length;
+      doneElem.textContent = doneCount;
+    }
+
+    fetchCampaigns();
+
+    // ================= DELETE =================
+    async function deleteCampaign(id) {
+      if (!confirm("Are you sure you want to delete this campaign?")) return;
+
+      try {
+        const response = await fetch(`http://localhost:9090/campaigns/${id}`, {
+          method: "DELETE",
+        });
+        if (!response.ok) throw new Error("Failed to delete campaign");
+        showToast("Campaign deleted successfully", "success");
+        fetchCampaigns();
+      } catch (error) {
+        console.error("Error deleting campaign:", error);
+        showToast("Error deleting campaign", "error");
+      }
+    }
+
+    // ================= EDIT =================
+    async function editCampaign(id) {
+      try {
+        const response = await fetch(`http://localhost:9090/campaigns/${id}`, {
+          method: "GET",
+        });
+        if (!response.ok) throw new Error("Failed to fetch campaign details");
+
+        const campaign = await response.json();
+
+        document.getElementById("modal-title-text").textContent =
+          "Edit Campaign";
+        document.getElementById("c-name").value = campaign.title || "";
+        document.getElementById("c-location").value = campaign.location || "";
+        document.getElementById("c-date").value = campaign.date
+          ? campaign.date.split("T")[0]
+          : "";
+        document.getElementById("c-description").value =
+          campaign.description || "";
+
+        // FIX 7: Replace onclick directly (no stacking)
+        var saveBtn = document.getElementById("save-btn");
+        saveBtn.onclick = function () {
+          saveCampaign(id);
+        };
+
+        document.getElementById("modal-overlay").style.display = "flex";
+      } catch (error) {
+        console.error("Error fetching campaign details:", error);
+        showToast("Error fetching campaign details", "error");
+      }
+    }
+
+    // ================= SAVE / UPDATE =================
+    async function saveCampaign(id) {
+      try {
+        const updatedCampaign = {
+          title: document.getElementById("c-name").value,
+          location: document.getElementById("c-location").value,
+          date: document.getElementById("c-date").value,
+          description: document.getElementById("c-description").value,
+        };
+
+        const response = await fetch(`http://localhost:9090/campaigns/${id}`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedCampaign),
+        });
+
+        if (!response.ok) throw new Error("Failed to update campaign");
+
+        showToast("Campaign updated successfully", "success");
+        closeModal(); // FIX 8: Use closeModal() for consistent hiding
+        fetchCampaigns();
+      } catch (error) {
+        console.error("Error updating campaign:", error);
+        showToast("Error updating campaign", "error");
+      }
+    }
+
+    // ================= ADD =================
+    async function addCampaign() {
+      try {
+        const newCampaign = {
+          title: document.getElementById("c-name").value,
+          location: document.getElementById("c-location").value,
+          date: document.getElementById("c-date").value,
+          description: document.getElementById("c-description").value,
+        };
+
+        const response = await fetch(
+          `http://localhost:9090/campaigns?prId=${prId}`, // ✅ FIX HERE
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(newCampaign),
+          },
+        );
+
+        if (!response.ok) {
+          const error = await response.text();
+          throw new Error(error);
+        }
+
+        showToast("Campaign added successfully", "success");
+        closeModal();
+        fetchCampaigns();
+      } catch (error) {
+        console.error("Error adding campaign:", error);
+        showToast("Error adding campaign", "error");
+      }
+    }
+
+    // ================= TOAST =================
+    function showToast(message, type = "success") {
+      const toast = document.getElementById("toast");
+      toast.textContent = message;
+      toast.className = `toast ${type} show`;
+      clearTimeout(window.toastTimeout);
+      window.toastTimeout = setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2500);
+    }
+
+    // ================= DATE MIN =================
+    window.addEventListener("DOMContentLoaded", () => {
+      const dateInput = document.getElementById("c-date");
+      const today = new Date();
+      today.setDate(today.getDate() + 1);
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, "0");
+      const dd = String(today.getDate()).padStart(2, "0");
+      dateInput.min = `${yyyy}-${mm}-${dd}`;
+    });
+    let deleteId = null;
+
+    function openConfirm(id) {
+      deleteId = id;
+      document.getElementById("confirm-modal").style.display = "flex";
+    }
+
+    function closeConfirm() {
+      deleteId = null;
+      document.getElementById("confirm-modal").style.display = "none";
+    }
+
+    document.getElementById("confirm-delete-btn").onclick = async function () {
+      if (!deleteId) return;
+
+      try {
+        const response = await fetch(
+          `http://localhost:9090/campaigns/${deleteId}`,
+          {
+            method: "DELETE",
+          },
+        );
+
+        if (!response.ok) throw new Error("Failed to delete campaign");
+
+        showToast("Campaign deleted successfully", "success");
+        closeConfirm();
+        fetchCampaigns();
+      } catch (error) {
+        console.error("Error deleting campaign:", error);
+        showToast("Error deleting campaign", "error");
+      }
+    };
+  </script>
+</html>
