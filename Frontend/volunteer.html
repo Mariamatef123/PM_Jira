@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>شريان العطاء - تطوع معنا</title>
+    <link rel="stylesheet" href="CSS/style.css" />
+    <style>
+      .calendar-grid,
+      .time-slots {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+        gap: 10px;
+        margin-top: 10px;
+        margin-bottom: 20px;
+        width: 103%;
+      }
+      .item-box {
+        padding: 8px;
+        border: 1px solid #ddd;
+        text-align: center;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+        font-size: 14px;
+      }
+      .available {
+        background-color: #e8f5e9;
+        color: #2e7d32;
+        border-color: #a5d6a7;
+      }
+      .disabled {
+        background-color: #f5f5f5;
+        color: #9e9e9e;
+        cursor: not-allowed;
+        opacity: 0.6;
+      }
+      .selected {
+        background-color: #c62828 !important;
+        color: white !important;
+        border-color: #b71c1c;
+        transform: scale(1.05);
+      }
+      .hidden {
+        display: none;
+      }
+      .alert-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 0;
+        transition: opacity 0.25s;
+        pointer-events: none;
+      }
+      .alert-overlay.show {
+        opacity: 1;
+        pointer-events: all;
+      }
+      .alert-box {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem 2rem 1.5rem;
+        width: 90%;
+        max-width: 340px;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        transform: scale(0.85);
+        transition: transform 0.25s;
+      }
+      .alert-overlay.show .alert-box {
+        transform: scale(1);
+      }
+
+      .alert-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 30px;
+      }
+      .alert-icon.success {
+        background: #eaf3de;
+        color: #3b6d11;
+      }
+      .alert-icon.error {
+        background: #fcebeb;
+        color: #a32d2d;
+      }
+
+      .alert-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: #1a1a1a;
+      }
+      .alert-message {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 1.5rem;
+        line-height: 1.6;
+      }
+      .alert-btn {
+        width: 100%;
+        padding: 11px;
+        border: none;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: opacity 0.2s;
+        color: white;
+      }
+      .alert-btn:hover {
+        opacity: 0.85;
+      }
+      .alert-btn.success {
+        background: #c62828;
+      }
+      .alert-btn.error {
+        background: #a32d2d;
+      }
+    </style>
+  </head>
+  <body style="direction: ltr">
+    <nav class="navbar" style="direction: rtl">
+      <div class="logo-container">
+        <img src="Images/logo.jpg" style="height: 50px" alt="Logo" />
+        <!-- <h1 class="hadeer">Shريان العطاء</h1> 
+          <span class="heart-icon">❤️</span> -->
+      </div>
+      <a href="index.html" class="nav-item">الرئيسية</a>
+    </nav>
+
+    <div class="content-box">
+      <h1 style="text-align: center">Volunteer with us</h1>
+
+      <p style="text-align: center; color: #666">
+        Your volunteering brings new hope to a sick child
+      </p>
+
+      <form id="volunteerForm" style="max-width: 600px; margin: 20px auto">
+        <input
+          type="text"
+          id="userName"
+          placeholder="Name"
+          required
+          style="
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            direction: ltr;
+          "
+        />
+        <input
+          type="tel"
+          id="phoneNumber"
+          placeholder="Phone Number"
+          required
+          style="
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            direction: ltr;
+          "
+        />
+        <input
+          type="email"
+          id="personalEmail"
+          placeholder="Personal Email"
+          required
+          style="
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            direction: ltr;
+          "
+        />
+        <!-- <input
+          type="text"
+          id="userYear"
+          placeholder="السنة الدراسية"
+          required
+          style="width: 100%; padding: 10px; margin-bottom: 10px"
+        /> -->
+        <input
+          type="email"
+          id="userEmail"
+          placeholder="University email"
+          required
+          style="
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            direction: ltr;
+          "
+        />
+
+        <!-- <h3>1. اختر الشهر</h3>
+        <div id="monthPicker" class="calendar-grid"></div>
+
+        <div id="daySection" class="hidden"> -->
+        <div>
+          <h3 style="text-align: left">Select a Date</h3>
+        </div>
+        <div id="slotsContainer" class="time-slots"></div>
+        <!-- <div id="dayPicker" class="calendar-grid"></div> -->
+        <!-- </div>
+
+        <div id="timeSection" class="hidden">
+          <h3>3. اختر موعد المقابلة</h3>
+          <div id="timePicker" class="time-slots"></div>
+        </div> -->
+
+        <button
+          type="submit"
+          class="btn-submit-step"
+          style="
+            margin-top: 20px;
+            width: 103%;
+            padding: 15px;
+            background: #c62828;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+          "
+        >
+          إرسال طلب التطوع
+        </button>
+      </form>
+    </div>
+    <div class="alert-overlay" id="alertOverlay">
+      <div class="alert-box">
+        <div class="alert-icon" id="alertIcon"></div>
+        <div class="alert-title" id="alertTitle"></div>
+        <div class="alert-message" id="alertMessage"></div>
+        <button class="alert-btn" id="alertBtn" onclick="closeAlert()"></button>
+      </div>
+    </div>
+    <script>
+      let selectedSlot = null;
+      let alertCallback = null;
+      let alertShouldRedirect = false;
+
+      function showAlert(type, title, message, btnText, callback) {
+        document.getElementById("alertIcon").className = "alert-icon " + type;
+        document.getElementById("alertIcon").textContent =
+          type === "success" ? "✓" : "✕";
+        document.getElementById("alertTitle").textContent = title;
+        document.getElementById("alertMessage").textContent = message;
+        document.getElementById("alertBtn").textContent = btnText;
+        document.getElementById("alertBtn").className = "alert-btn " + type;
+
+        alertCallback = callback || null;
+        document.getElementById("alertOverlay").classList.add("show");
+      }
+
+      function closeAlert() {
+        document.getElementById("alertOverlay").classList.remove("show");
+        if (alertCallback) {
+          alertCallback();
+          alertCallback = null;
+        }
+      }
+      function convertTo12Hour(timeStr) {
+        let [hours, minutes] = timeStr.split(":");
+
+        hours = parseInt(hours, 10);
+
+        const period = hours >= 12 ? "PM" : "AM";
+
+        hours = hours % 12;
+        if (hours === 0) hours = 12;
+
+        return `${hours}:${minutes} ${period}`;
+      }
+      function formatDateDMY(dateStr) {
+        const [year, month, day] = dateStr.split("-");
+
+        return `${day}-${month}-${year}`;
+      }
+      async function loadSlots() {
+        try {
+          const response = await fetch(
+            "http://localhost:9090/interviews/9/slots",
+          );
+
+          if (!response.ok) {
+            throw new Error("Failed to fetch slots");
+          }
+
+          const data = await response.json();
+          console.log("Slots:", data);
+
+          const container = document.getElementById("slotsContainer");
+          container.innerHTML = "";
+
+          data.forEach((slot) => {
+            const div = document.createElement("div");
+            div.className = "item-box";
+
+            if (slot.status === "AVAILABLE") {
+              div.classList.add("available");
+
+              div.onclick = () => selectSlot(div, slot);
+            } else {
+              div.classList.add("disabled");
+            }
+
+            div.innerHTML = `
+              <div>${formatDateDMY(slot.date)}</div>
+              <div style="direction:ltr">${convertTo12Hour(slot.time)}</div>
+            `;
+
+            container.appendChild(div);
+          });
+        } catch (error) {
+          console.error("Error loading slots:", error);
+
+          showAlert(
+            "error",
+            "Error",
+            "Failed to load interview slots. Please try again later.",
+            "OK",
+          );
+        }
+      }
+
+      function selectSlot(element, slot) {
+        clearSelection("#slotsContainer .item-box");
+
+        element.classList.add("selected");
+        selectedSlot = slot;
+
+        console.log("Selected slot:", selectedSlot);
+      }
+
+      function clearSelection(selector) {
+        document
+          .querySelectorAll(selector)
+          .forEach((item) => item.classList.remove("selected"));
+      }
+
+      document.getElementById("volunteerForm").onsubmit = async function (e) {
+        e.preventDefault();
+
+        if (!selectedSlot) {
+          showAlert(
+            "error",
+            "Error",
+            "Please select an interview date first.",
+            "OK",
+          );
+          return;
+        }
+
+        const name = document.getElementById("userName").value.trim();
+        const email = document.getElementById("userEmail").value.trim();
+        const personalEmail = document
+          .getElementById("personalEmail")
+          .value.trim();
+        const phoneNumber = document.getElementById("phoneNumber").value.trim();
+
+        console.log("Email sent:", email);
+
+        const submitBtn = document.querySelector(".btn-submit-step");
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Processing...";
+
+        try {
+          const createResponse = await fetch(
+            "http://localhost:9090/create-volunteer",
+            {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                name: name,
+                universityEmail: email,
+                phone: phoneNumber,
+                email: personalEmail,
+              }),
+            },
+          );
+
+          const text = await createResponse.text();
+
+          let createResult;
+          try {
+            createResult = JSON.parse(text);
+          } catch {
+            createResult = text;
+          }
+
+          if (!createResponse.ok) {
+            throw new Error(
+              typeof createResult === "string"
+                ? createResult
+                : createResult.message || "Error creating volunteer",
+            );
+          }
+
+          console.log("Volunteer created:", createResult.id);
+
+          const chooseResponse = await fetch(
+            `http://localhost:9090/volunteer/${createResult.id}/choose-slot/${selectedSlot.id}`,
+
+            {
+              method: "POST",
+            },
+          );
+
+          if (!chooseResponse.ok) {
+            throw new Error("Failed to book interview slot");
+          }
+
+          showAlert(
+            "success",
+            "Booked Successfully",
+            "Your interview appointment has been booked successfully. Thank you for volunteering!",
+            "Back to Home",
+            () => {
+              window.location.href = "index.html";
+            },
+          );
+          document.getElementById("volunteerForm").reset();
+          selectedSlot = null;
+          clearSelection("#slotsContainer .item-box");
+        } catch (error) {
+          console.error("Error:", error);
+          showAlert(
+            "error",
+            "Error",
+            error.message || "An unexpected error occurred",
+            "OK",
+          );
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerText = "Submit Application";
+        }
+      };
+
+      window.onload = loadSlots;
+      loadSlots();
+    </script>
+  </body>
+</html>

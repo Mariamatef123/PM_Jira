@@ -1,0 +1,1292 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Volunteers — System</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --sidebar-w: 230px;
+        --bg: #fff0f5;
+        --sidebar-bg: #2a1a2f;
+        --sidebar-hover: #3a2340;
+        --sidebar-active: #4a2d52;
+        --accent: #e91e63;
+        --accent2: #ff4da6;
+        --accent3: #ff85c1;
+        --text-main: #2a1a2f;
+        --text-muted: #a07a8c;
+        --card-bg: #ffffff;
+        --border: #f3d6e4;
+        --transition: all 0.2s ease;
+      }
+
+      body {
+        font-family: "DM Sans", sans-serif;
+        background: var(--bg);
+        color: var(--text-main);
+        min-height: 100vh;
+        display: flex;
+      }
+
+      /* SIDEBAR */
+      .sidebar {
+        width: var(--sidebar-w);
+        min-height: 100vh;
+        background: var(--sidebar-bg);
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        z-index: 100;
+      }
+
+      .sidebar-logo {
+        padding: 24px 20px 20px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .sidebar-logo h2 {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 18px;
+        font-weight: 700;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .logo-icon {
+        width: 32px;
+        height: 32px;
+        background: var(--accent);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+      }
+
+      .sidebar-nav {
+        flex: 1;
+        padding: 16px 12px;
+      }
+
+      .nav-label {
+        font-size: 10px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.3);
+        letter-spacing: 1.2px;
+        text-transform: uppercase;
+        padding: 0 8px;
+        margin-bottom: 8px;
+        margin-top: 16px;
+      }
+
+      .nav-label:first-child {
+        margin-top: 0;
+      }
+
+      .sidebar ul {
+        list-style: none;
+      }
+
+      .sidebar li {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+        padding: 10px 12px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.55);
+        transition: var(--transition);
+        margin-bottom: 2px;
+        position: relative;
+      }
+
+      .sidebar li:hover {
+        background: var(--sidebar-hover);
+        color: rgba(255, 255, 255, 0.85);
+      }
+
+      .sidebar li.active {
+        background: var(--sidebar-active);
+        color: #fff;
+      }
+
+      .sidebar li.active::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 3px;
+        height: 60%;
+        background: var(--accent);
+        border-radius: 0 3px 3px 0;
+      }
+
+      .nav-icon {
+        width: 18px;
+        height: 18px;
+        flex-shrink: 0;
+        opacity: 0.7;
+      }
+
+      .sidebar li.active .nav-icon,
+      .sidebar li:hover .nav-icon {
+        opacity: 1;
+      }
+
+      .sidebar-footer {
+        padding: 16px 12px;
+        border-top: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .user-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px;
+        border-radius: 8px;
+      }
+
+      .avatar {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #4f7ef8, #38c98a);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 600;
+        color: white;
+        flex-shrink: 0;
+      }
+
+      .user-name {
+        font-size: 13px;
+        font-weight: 500;
+        color: rgba(255, 255, 255, 0.85);
+      }
+
+      .user-role {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.35);
+      }
+
+      /* MAIN */
+      .main {
+        margin-left: var(--sidebar-w);
+        flex: 1;
+        padding: 32px 36px;
+        min-height: 100vh;
+      }
+
+      .page-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 24px;
+      }
+
+      .page-header h1 {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 24px;
+        font-weight: 600;
+        color: var(--text-main);
+      }
+
+      .page-header p {
+        font-size: 13px;
+        color: var(--text-muted);
+        margin-top: 3px;
+      }
+
+      /* STATS CARDS */
+      .stats-row {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin-bottom: 22px;
+      }
+
+      .stat-card {
+        background: var(--card-bg);
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        padding: 16px 18px;
+        animation: fadeUp 0.3s ease both;
+      }
+
+      .stat-card:nth-child(1) {
+        animation-delay: 0.05s;
+      }
+      .stat-card:nth-child(2) {
+        animation-delay: 0.1s;
+      }
+      .stat-card:nth-child(3) {
+        animation-delay: 0.15s;
+      }
+      .stat-card:nth-child(4) {
+        animation-delay: 0.2s;
+      }
+
+      .stat-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 6px;
+      }
+
+      .stat-value {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 26px;
+        font-weight: 700;
+      }
+
+      .stat-card.blue .stat-value {
+        color: #ff4f8b;
+      }
+      .stat-card.green .stat-value {
+        color: #ff6fa5;
+      }
+      .stat-card.orange .stat-value {
+        color: #ff9ec2;
+      }
+      .stat-card.red .stat-value {
+        color: #d6336c;
+      }
+
+      /* TOOLBAR */
+      .toolbar {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 18px;
+        flex-wrap: wrap;
+      }
+
+      .search-wrap {
+        position: relative;
+        flex: 1;
+        min-width: 200px;
+        max-width: 300px;
+      }
+
+      .search-wrap input {
+        width: 100%;
+        padding: 9px 12px 9px 36px;
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        font-size: 13px;
+        font-family: "DM Sans", sans-serif;
+        background: var(--card-bg);
+        color: var(--text-main);
+        outline: none;
+        transition: border 0.2s;
+      }
+
+      .search-wrap input:focus {
+        border-color: var(--accent);
+      }
+
+      .search-icon {
+        position: absolute;
+        left: 11px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        font-size: 14px;
+        pointer-events: none;
+      }
+
+      .filter-select {
+        padding: 9px 14px;
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        font-size: 13px;
+        font-family: "DM Sans", sans-serif;
+        background: var(--card-bg);
+        color: var(--text-main);
+        outline: none;
+        cursor: pointer;
+        transition: border 0.2s;
+      }
+
+      .filter-select:focus {
+        border-color: var(--accent);
+      }
+
+      .count-badge {
+        margin-left: auto;
+        font-size: 12px;
+        color: var(--text-muted);
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        padding: 7px 14px;
+        border-radius: 8px;
+      }
+
+      /* TABLE */
+      .table-wrap {
+        background: var(--card-bg);
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        overflow: hidden;
+        animation: fadeUp 0.35s ease 0.2s both;
+      }
+
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+
+      thead tr {
+        background: #ffe4ec;
+        border-bottom: 1px solid var(--border);
+      }
+
+      thead th {
+        padding: 13px 16px;
+        text-align: left;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        cursor: pointer;
+        user-select: none;
+        white-space: nowrap;
+      }
+
+      thead th:hover {
+        color: var(--text-main);
+      }
+
+      tbody tr {
+        border-bottom: 1px solid var(--border);
+        transition: background 0.15s;
+      }
+
+      tbody tr:last-child {
+        border-bottom: none;
+      }
+      tbody tr:hover {
+        background: #fff0f5;
+      }
+
+      td {
+        padding: 13px 16px;
+        font-size: 13px;
+        color: var(--text-main);
+        vertical-align: middle;
+      }
+
+      .vol-cell {
+        display: flex;
+        align-items: center;
+        gap: 11px;
+      }
+
+      .vol-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        font-weight: 600;
+        color: white;
+        flex-shrink: 0;
+      }
+
+      .vol-name {
+        font-weight: 500;
+        font-size: 13px;
+        color: var(--text-main);
+      }
+      .vol-email {
+        font-size: 11px;
+        color: var(--text-muted);
+      }
+
+      .status-badge {
+        font-size: 11px;
+        font-weight: 500;
+        padding: 3px 10px;
+        border-radius: 20px;
+        display: inline-block;
+      }
+
+      .status-APPROVED {
+        background: #e8f8ef;
+        color: #1e7e4a;
+      }
+      .status-PENDING {
+        background: #fff8e1;
+        color: #c67c00;
+      }
+      .status-REJECTED {
+        background: #fdecea;
+        color: #c0392b;
+      }
+      .status-ASSIGNED {
+        background: #eef2ff;
+        color: #4f7ef8;
+      }
+
+      .action-btns {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+      }
+
+      .btn-edit,
+      .btn-del,
+      .btn-assign {
+        border: none;
+        border-radius: 7px;
+        padding: 5px 11px;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        font-family: "DM Sans", sans-serif;
+        transition: var(--transition);
+      }
+
+      .btn-edit {
+        background: #ffe4ec;
+        color: #ff4f8b;
+      }
+      .btn-edit:hover {
+        background: #ffd6e4;
+      }
+      .btn-del {
+        background: #fdecea;
+        color: #c0392b;
+      }
+      .btn-del:hover {
+        background: #fbd5d2;
+      }
+      .btn-assign {
+        background: #eef2ff;
+        color: #4f7ef8;
+      }
+      .btn-assign:hover {
+        background: #dde5ff;
+      }
+      .btn-assign:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--text-muted);
+        font-size: 14px;
+      }
+      .empty-state div {
+        font-size: 32px;
+        margin-bottom: 12px;
+      }
+
+      /* MODAL */
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.35);
+        z-index: 200;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modal-overlay.open {
+        display: flex;
+      }
+
+      .modal {
+        background: var(--card-bg);
+        border-radius: 16px;
+        padding: 28px;
+        width: 460px;
+        max-width: 95vw;
+        animation: fadeUp 0.25s ease;
+      }
+
+      .modal-title {
+        font-family: "Space Grotesk", sans-serif;
+        font-size: 17px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .modal-close {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: var(--text-muted);
+        line-height: 1;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-bottom: 14px;
+      }
+
+      .form-row.full {
+        grid-template-columns: 1fr;
+      }
+
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+      }
+
+      .form-group label {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+      }
+
+      .form-group input,
+      .form-group select {
+        padding: 9px 12px;
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        font-size: 13px;
+        font-family: "DM Sans", sans-serif;
+        color: var(--text-main);
+        background: var(--card-bg);
+        outline: none;
+        transition: border 0.2s;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus {
+        border-color: var(--accent);
+      }
+
+      .modal-footer {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 20px;
+      }
+
+      .btn-cancel {
+        padding: 9px 18px;
+        border: 1px solid var(--border);
+        border-radius: 9px;
+        background: none;
+        font-size: 13px;
+        font-family: "DM Sans", sans-serif;
+        cursor: pointer;
+        color: var(--text-muted);
+        transition: var(--transition);
+      }
+
+      .btn-cancel:hover {
+        background: var(--bg);
+      }
+
+      .btn-save {
+        padding: 9px 20px;
+        border: none;
+        border-radius: 9px;
+        background: var(--accent2);
+        color: white;
+        font-size: 13px;
+        font-weight: 500;
+        font-family: "DM Sans", sans-serif;
+        cursor: pointer;
+        transition: var(--transition);
+      }
+
+      .btn-save:hover {
+        background: #e84379;
+      }
+      .btn-save:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      /* Toast */
+      .toast {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: #1e1e2e;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 10px;
+        font-size: 13px;
+        font-weight: 500;
+        z-index: 999;
+        animation: toastIn 0.3s ease;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+        max-width: 320px;
+      }
+      @keyframes toastIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <div class="sidebar-logo">
+        <h2>
+          <div class="logo-icon">⚡</div>
+          System
+        </h2>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-label">Main</div>
+        <ul>
+          <li onclick="go('hrAdmin.html')">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor">
+              <path
+                d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z"
+              />
+            </svg>
+            Dashboard
+          </li>
+        </ul>
+        <div class="nav-label">Management</div>
+        <ul>
+          <li onclick="go('staff.html')">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor">
+              <path
+                d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"
+              />
+            </svg>
+            Staff
+          </li>
+          <li class="active" onclick="go('volunteers.html')">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor">
+              <path
+                fill-rule="evenodd"
+                d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            Volunteers
+          </li>
+          <li onclick="go('interview.html')">
+            <svg class="nav-icon" viewBox="0 0 20 20" fill="currentColor">
+              <path
+                fill-rule="evenodd"
+                d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z"
+                clip-rule="evenodd"
+              />
+            </svg>
+            Interview
+          </li>
+        </ul>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-info">
+          <div class="avatar">A</div>
+          <div>
+            <div class="user-name">Admin</div>
+            <div class="user-role">System Manager</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div class="main">
+      <div class="page-header">
+        <div>
+          <h1>Volunteers</h1>
+          <p>Manage and track all volunteer applications</p>
+        </div>
+        <!-- No "Add Volunteer" button -->
+      </div>
+
+      <!-- STATISTICS CARDS -->
+      <div class="stats-row">
+        <div class="stat-card blue">
+          <div class="stat-label">Total</div>
+          <div class="stat-value" id="st-total">0</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">Approved</div>
+          <div class="stat-value" id="st-approved">0</div>
+        </div>
+        <div class="stat-card orange">
+          <div class="stat-label">Pending</div>
+          <div class="stat-value" id="st-pending">0</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-label">Rejected</div>
+          <div class="stat-value" id="st-rejected">0</div>
+        </div>
+      </div>
+
+      <!-- TOOLBAR -->
+      <div class="toolbar">
+        <div class="search-wrap">
+          <span class="search-icon">🔍</span>
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Search name, email, phone..."
+            oninput="renderTable()"
+          />
+        </div>
+        <select
+          class="filter-select"
+          id="filter-status"
+          onchange="renderTable()"
+        >
+          <option value="">All Status</option>
+          <option value="APPROVED">Approved</option>
+          <option value="PENDING">Pending</option>
+          <option value="REJECTED">Rejected</option>
+          <option value="ASSIGNED">Assigned</option>
+        </select>
+        <div class="count-badge" id="count-badge">0 volunteers</div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th onclick="sortBy('name')">Name ↕</th>
+              <th onclick="sortBy('universityEmail')">University Email ↕</th>
+              <th onclick="sortBy('phone')">Phone ↕</th>
+              <th onclick="sortBy('status')">Status ↕</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="vol-tbody"></tbody>
+        </table>
+        <div class="empty-state" id="empty-state" style="display: none">
+          <div>🙋</div>
+          No volunteers found
+        </div>
+      </div>
+    </div>
+
+    <!-- ASSIGN MODAL -->
+    <div
+      class="modal-overlay"
+      id="assign-modal"
+      onclick="closeAssignOutside(event)"
+    >
+      <div class="modal">
+        <div class="modal-title">
+          <span>Assign Volunteer to HR</span>
+          <button class="modal-close" onclick="closeAssignModal()">
+            &times;
+          </button>
+        </div>
+        <div class="form-row full">
+          <div class="form-group">
+            <label>Select Target HR Member</label>
+            <select id="target-hr-select">
+              <option value="" disabled selected>Choose HR member…</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-cancel" onclick="closeAssignModal()">
+            Cancel
+          </button>
+          <button
+            class="btn-save"
+            id="btn-assign-save"
+            onclick="confirmAssign()"
+          >
+            Assign
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- EDIT MODAL -->
+    <div
+      class="modal-overlay"
+      id="modal-overlay"
+      onclick="closeModalOutside(event)"
+    >
+      <div class="modal">
+        <div class="modal-title">
+          <span id="modal-title-text">Edit Volunteer</span>
+          <button class="modal-close" onclick="closeModal()">&times;</button>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>First Name</label>
+            <input type="text" id="f-fname" placeholder="Sara" />
+          </div>
+          <div class="form-group">
+            <label>Last Name</label>
+            <input type="text" id="f-lname" placeholder="Ahmed" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="f-email" placeholder="sara@example.com" />
+          </div>
+          <div class="form-group">
+            <label>University Email</label>
+            <input type="email" id="f-uni-email" placeholder="sara@uni.edu" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Phone</label>
+            <input type="text" id="f-phone" placeholder="+20 1xx xxx xxxx" />
+          </div>
+          <div class="form-group">
+            <label>Status</label>
+            <select id="f-status">
+              <option value="PENDING">Pending</option>
+              <option value="APPROVED">Approved</option>
+              <option value="REJECTED">Rejected</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+          <button class="btn-save" id="btn-edit-save" onclick="saveVolunteer()">
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        const BASE = "http://localhost:9090";
+
+        // ── Auth ──
+        let hrId = null;
+        const stored = localStorage.getItem("user");
+        if (stored) {
+          try {
+            const user = JSON.parse(stored);
+            if (user.role !== "HR_ADMIN") {
+              window.location.href = "login.html";
+              return;
+            }
+            hrId = user.id;
+          } catch (e) {
+            window.location.href = "login.html";
+            return;
+          }
+        } else {
+          window.location.href = "login.html";
+          return;
+        }
+
+        window.go = (page) => (window.location.href = page);
+
+        // ── State ──
+        const COLORS = [
+          "#4f7ef8",
+          "#38c98a",
+          "#f5a623",
+          "#e74c3c",
+          "#a78bfa",
+          "#0ea5e9",
+          "#f43f5e",
+          "#10b981",
+        ];
+        let volunteersData = [];
+        let hrMembers = []; // for assign dropdown
+        let editingId = null;
+        let assigningVolId = null;
+        let sortKey = null;
+        let sortAsc = true;
+
+        // ── Helpers ──
+        function getInitials(name) {
+          if (!name) return "?";
+          return name
+            .split(" ")
+            .map((w) => w[0])
+            .join("")
+            .slice(0, 2)
+            .toUpperCase();
+        }
+        function getColor(name) {
+          if (!name) return COLORS[0];
+          let hash = 0;
+          for (let c of name) hash = c.charCodeAt(0) + ((hash << 5) - hash);
+          return COLORS[Math.abs(hash) % COLORS.length];
+        }
+        function showToast(msg) {
+          const t = document.createElement("div");
+          t.className = "toast";
+          t.textContent = msg;
+          document.body.appendChild(t);
+          setTimeout(() => t.remove(), 3200);
+        }
+
+        // ── Stats ──
+        function updateStats() {
+          document.getElementById("st-total").textContent =
+            volunteersData.length;
+          document.getElementById("st-approved").textContent =
+            volunteersData.filter((v) => v.status === "APPROVED").length;
+          document.getElementById("st-pending").textContent =
+            volunteersData.filter((v) => v.status === "PENDING").length;
+          document.getElementById("st-rejected").textContent =
+            volunteersData.filter((v) => v.status === "REJECTED").length;
+        }
+
+        // ── Filter + Sort ──
+        function getFiltered() {
+          const q = document.getElementById("search-input").value.toLowerCase();
+          const status = document.getElementById("filter-status").value;
+
+          let list = volunteersData.filter((v) => {
+            const matchQ =
+              !q ||
+              (v.name && v.name.toLowerCase().includes(q)) ||
+              (v.universityEmail &&
+                v.universityEmail.toLowerCase().includes(q)) ||
+              (v.email && v.email.toLowerCase().includes(q)) ||
+              (v.phone && v.phone.toLowerCase().includes(q));
+            const matchStatus = !status || v.status === status;
+            return matchQ && matchStatus;
+          });
+
+          if (sortKey) {
+            list.sort((a, b) => {
+              const av = a[sortKey] || "",
+                bv = b[sortKey] || "";
+              return sortAsc
+                ? av.toString().localeCompare(bv.toString())
+                : bv.toString().localeCompare(av.toString());
+            });
+          }
+          return list;
+        }
+
+        // ── Render Table ──
+        function renderTable() {
+          const list = getFiltered();
+          const tbody = document.getElementById("vol-tbody");
+          const empty = document.getElementById("empty-state");
+          document.getElementById("count-badge").textContent =
+            `${list.length} volunteer${list.length !== 1 ? "s" : ""}`;
+          updateStats();
+
+          if (!list.length) {
+            tbody.innerHTML = "";
+            empty.style.display = "block";
+            return;
+          }
+          empty.style.display = "none";
+
+          tbody.innerHTML = list
+            .map(
+              (v) => `
+            <tr>
+              <td>
+                <div class="vol-cell">
+                  <div class="vol-avatar" style="background:${getColor(v.name)}">${getInitials(v.name)}</div>
+                  <div>
+                    <div class="vol-name">${v.name || "-"}</div>
+                  </div>
+                </div>
+              </td>
+              <td style="color:var(--text-muted);font-size:12px;">${v.universityEmail || v.email || "-"}</td>
+              <td style="color:var(--text-muted);font-size:12px;">${v.phone || v.phoneNumber || "-"}</td>
+              <td><span class="status-badge status-${v.status || "PENDING"}">${v.status || "PENDING"}</span></td>
+              <td>
+                <div class="action-btns">
+                
+                  <button class="btn-assign" onclick="openAssignModal(${v.id})">Assign</button>
+              
+                </div>
+              </td>
+            </tr>
+          `,
+            )
+            .join("");
+        }
+
+        window.renderTable = renderTable;
+
+        window.sortBy = function (key) {
+          if (sortKey === key) sortAsc = !sortAsc;
+          else {
+            sortKey = key;
+            sortAsc = true;
+          }
+          renderTable();
+        };
+
+        // ── Fetch Volunteers ──
+        // GET /pending-volunteers?hrId={hrId}
+        async function fetchVolunteers() {
+          try {
+            const res = await fetch(`${BASE}/pending-volunteers?hrId=${hrId}`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            volunteersData = await res.json();
+            renderTable();
+          } catch (e) {
+            showToast("❌ Could not load volunteers: " + e.message);
+          }
+        }
+
+        // ── Fetch HR Members (for assign dropdown) ──
+        // GET /hr/staff-departments  → gives roles, but we need HR members list
+        // Using GET /staff?hrId={hrId} to get all HR staff as potential targets
+        async function fetchHrMembers() {
+          try {
+            const res = await fetch(`${BASE}/staff?hrId=${hrId}`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            hrMembers = await res.json();
+          } catch (e) {
+            console.warn("Could not load HR members:", e.message);
+            hrMembers = [];
+          }
+        }
+
+        // ── Delete Volunteer ──
+        // DELETE /volunteers/{id}?hrId={hrId}
+        window.deleteVolunteer = async function (id) {
+          if (!confirm("Delete this volunteer?")) return;
+          try {
+            const res = await fetch(`${BASE}/volunteers/${id}?hrId=${hrId}`, {
+              method: "DELETE",
+            });
+            if (!res.ok)
+              throw new Error((await res.text()) || `HTTP ${res.status}`);
+            volunteersData = volunteersData.filter((v) => v.id !== id);
+            renderTable();
+            showToast("🗑️ Volunteer deleted");
+          } catch (e) {
+            showToast("❌ " + e.message);
+          }
+        };
+
+        // ── Edit Volunteer ──
+        window.editVolunteer = function (id) {
+          editingId = id;
+          const v = volunteersData.find((x) => x.id === id);
+          if (!v) return;
+          const parts = (v.name || "").split(" ");
+          document.getElementById("f-fname").value = parts[0] || "";
+          document.getElementById("f-lname").value =
+            parts.slice(1).join(" ") || "";
+          document.getElementById("f-email").value = v.email || "";
+          document.getElementById("f-uni-email").value =
+            v.universityEmail || "";
+          document.getElementById("f-phone").value =
+            v.phone || v.phoneNumber || "";
+          document.getElementById("f-status").value = v.status || "PENDING";
+          document.getElementById("modal-title-text").textContent =
+            "Edit Volunteer";
+          const btn = document.getElementById("btn-edit-save");
+          btn.disabled = false;
+          btn.textContent = "Save";
+          document.getElementById("modal-overlay").classList.add("open");
+        };
+
+        window.closeModal = function () {
+          document.getElementById("modal-overlay").classList.remove("open");
+          editingId = null;
+        };
+
+        window.closeModalOutside = function (e) {
+          if (e.target.id === "modal-overlay") window.closeModal();
+        };
+
+        // PUT /volunteers/{id}?hrId={hrId}
+        window.saveVolunteer = async function () {
+          const fname = document.getElementById("f-fname").value.trim();
+          const lname = document.getElementById("f-lname").value.trim();
+          const email = document.getElementById("f-email").value.trim();
+          const uniEmail = document.getElementById("f-uni-email").value.trim();
+          const phone = document.getElementById("f-phone").value.trim();
+          const status = document.getElementById("f-status").value;
+
+          if (!fname || !email) {
+            showToast("⚠️ Name and email are required");
+            return;
+          }
+
+          const payload = {
+            name: `${fname} ${lname}`.trim(),
+            email,
+            universityEmail: uniEmail,
+            phone,
+            status,
+          };
+
+          const btn = document.getElementById("btn-edit-save");
+          btn.disabled = true;
+          btn.textContent = "Saving…";
+
+          try {
+            const res = await fetch(
+              `${BASE}/volunteers/${editingId}?hrId=${hrId}`,
+              {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              },
+            );
+            if (!res.ok)
+              throw new Error((await res.text()) || `HTTP ${res.status}`);
+            showToast("✅ Volunteer updated");
+            window.closeModal();
+            await fetchVolunteers();
+          } catch (e) {
+            showToast("❌ " + e.message);
+          } finally {
+            btn.disabled = false;
+            btn.textContent = "Save";
+          }
+        };
+
+        // ── Assign Modal ──
+        window.openAssignModal = async function (volId) {
+          assigningVolId = volId;
+          // Reload HR members fresh
+          await fetchHrMembers();
+
+          const sel = document.getElementById("target-hr-select");
+          sel.innerHTML = `<option>Loading...</option>`;
+
+          const hrMembers = await getHrMembers();
+
+          sel.innerHTML = `<option value="" disabled selected>Choose HR member…</option>`;
+          hrMembers.forEach((hr) => {
+            sel.appendChild(
+              new Option(
+                `${hr.name} (${hr.role || hr.department || ""})`,
+                hr.id,
+              ),
+            );
+          });
+
+          const btn = document.getElementById("btn-assign-save");
+          btn.disabled = false;
+          btn.textContent = "Assign";
+          document.getElementById("assign-modal").classList.add("open");
+        };
+
+        async function getHrMembers() {
+          try {
+            const res = await fetch(`${BASE}/hr-members`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return await res.json();
+          } catch (e) {
+            console.warn("Could not load HR members:", e.message);
+            return [];
+          }
+        }
+        window.closeAssignModal = function () {
+          document.getElementById("assign-modal").classList.remove("open");
+          assigningVolId = null;
+        };
+
+        window.closeAssignOutside = function (e) {
+          if (e.target.id === "assign-modal") window.closeAssignModal();
+        };
+
+        // POST /assign-volunteer   body: { assignerHrId, volunteerId, targetHrId }
+        window.confirmAssign = async function () {
+          const targetHrId = parseInt(
+            document.getElementById("target-hr-select").value,
+          );
+          if (!targetHrId) {
+            showToast("⚠️ Please select an HR member");
+            return;
+          }
+
+          const btn = document.getElementById("btn-assign-save");
+          btn.disabled = true;
+          btn.textContent = "Assigning…";
+
+          try {
+            const res = await fetch(`${BASE}/assign-volunteer`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                assignerHrId: hrId,
+                volunteerId: assigningVolId,
+                targetHrId: targetHrId,
+              }),
+            });
+            if (!res.ok)
+              throw new Error((await res.text()) || `HTTP ${res.status}`);
+            showToast("✅ Volunteer assigned successfully");
+            window.closeAssignModal();
+            await fetchVolunteers();
+          } catch (e) {
+            showToast("❌ " + e.message);
+          } finally {
+            btn.disabled = false;
+            btn.textContent = "Assign";
+          }
+        };
+
+        // ── Init ──
+        fetchVolunteers();
+        fetchHrMembers();
+      })();
+    </script>
+  </body>
+</html>

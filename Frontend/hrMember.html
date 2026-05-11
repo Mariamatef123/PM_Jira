@@ -1,0 +1,926 @@
+<!-- <!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HR Member Dashboard</title>
+    <link rel="stylesheet" href="CSS/style1.css" />
+  </head>
+  <body>
+    <div class="layout">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <p class="sidebar-eyebrow">HR Member</p>
+          <h1>Team Control</h1>
+          <p>
+            Review volunteers, assign departments, and manage staff records.
+          </p>
+        </div>
+
+        <nav class="sidebar-nav">
+          <button class="nav-link active" type="button" data-page="pending">
+            Pending
+          </button>
+
+          <button class="nav-link" type="button" data-page="staff">
+            Staff
+          </button>
+        </nav>
+      </aside>
+
+      <main class="main">
+        <header class="page-header">
+          <div>
+            <p class="eyebrow">HR Workspace</p>
+            <h2 id="page-title">Pending Volunteers</h2>
+            <p id="page-subtitle" class="page-subtitle">
+              Review volunteer requests and decide who joins the team.
+            </p>
+          </div>
+        </header>
+
+        <section class="summary-grid">
+          <article class="summary-card">
+            <span class="summary-label">Pending Requests</span>
+            <strong id="pending-count">0</strong>
+          </article>
+
+          <article class="summary-card">
+            <span class="summary-label">Staff Members</span>
+            <strong id="staff-count">0</strong>
+          </article>
+        </section>
+
+        <section class="panel active" id="pendingPage">
+          <div class="panel-header">
+            <div>
+              <h3>Pending Volunteers</h3>
+              <p>
+                Accept or reject applications, and choose the department before
+                approval.
+              </p>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Assign Department</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="pendingTable"></tbody>
+            </table>
+            <div class="empty-state" id="pending-empty">
+              <h3>No pending volunteers</h3>
+              <p>All requests are processed right now.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel" id="staffPage">
+          <div class="panel-header">
+            <div>
+              <h3>Staff Members</h3>
+              <p>Update or delete staff entries from this page.</p>
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Department</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="staffTable"></tbody>
+            </table>
+            <div class="empty-state" id="staff-empty">
+              <h3>No staff members found</h3>
+              <p>Add staff data later if needed.</p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="JS/script1.js"></script>
+  </body>
+</html> -->
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HR Member · Team Control</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Syne:wght@600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="CSS/style1.css" />
+    <style>
+      /* 保留您原有的全部样式，并补充新增模态框样式 */
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      .user-chip {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+
+      .user-avatar {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        background: linear-gradient(145deg, #ff4da6, #c2185b);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 16px;
+        color: white;
+      }
+
+      .user-name {
+        font-size: 15px;
+        font-weight: 600;
+      }
+
+      .user-role {
+        font-size: 12px;
+        opacity: 0.6;
+      }
+
+      .dept-badge {
+        background: #ffe4ec;
+        color: #c2185b;
+      }
+
+      .empty-state {
+        display: none;
+        place-items: center;
+        gap: 12px;
+        min-height: 220px;
+        text-align: center;
+        color: #607089;
+        padding: 30px;
+      }
+
+      .empty-state.show {
+        display: grid;
+      }
+
+      .loading-row td {
+        text-align: center;
+        color: #607089;
+        padding: 30px;
+      }
+
+      /* ---------- MODAL ---------- */
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(26, 26, 46, 0.5);
+        backdrop-filter: blur(6px);
+        align-items: center;
+        justify-content: center;
+        z-index: 300;
+      }
+
+      .modal-overlay.open {
+        display: flex;
+      }
+
+      .modal {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        padding: 32px;
+        border-radius: 28px;
+        width: 460px;
+        max-width: 95vw;
+        box-shadow: 0 30px 70px rgba(0, 0, 0, 0.25);
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        animation: modalIn 0.2s ease;
+      }
+
+      @keyframes modalIn {
+        from {
+          opacity: 0;
+          transform: scale(0.95) translateY(8px);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+
+      .modal-title {
+        font-family: "Syne", sans-serif;
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 6px;
+      }
+
+      .modal-subtitle {
+        font-size: 14px;
+        color: #607089;
+        margin-bottom: 22px;
+      }
+
+      .form-group {
+        margin-bottom: 16px;
+      }
+
+      .form-group label {
+        display: block;
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        color: #4a536b;
+        text-transform: uppercase;
+        margin-bottom: 6px;
+      }
+
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 12px 14px;
+        border: 1.5px solid #d6dfeb;
+        border-radius: 14px;
+        background: white;
+        font-size: 15px;
+        transition: 0.15s;
+      }
+
+      .form-group input:focus,
+      .form-group select:focus {
+        border-color: #d81b60;
+        box-shadow: 0 0 0 3px rgba(216, 27, 96, 0.1);
+        outline: none;
+      }
+
+      .modal-footer {
+        margin-top: 24px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+
+      .btn-ghost {
+        border: 1px solid #d6dfeb;
+        background: transparent;
+        padding: 10px 18px;
+        border-radius: 14px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+
+      .btn-ghost:hover {
+        background: #f2f5f9;
+      }
+
+      .confirm-box {
+        text-align: center;
+      }
+
+      .confirm-icon {
+        font-size: 42px;
+        margin-bottom: 12px;
+      }
+
+      .confirm-msg {
+        font-size: 14px;
+        color: #607089;
+        margin: 16px 0 24px;
+      }
+
+      .confirm-btns {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+      }
+
+      /* ---------- TOAST ---------- */
+      .toast {
+        position: fixed;
+        bottom: 24px;
+        right: 24px;
+        background: #1e1e2f;
+        color: white;
+        padding: 14px 22px;
+        border-radius: 60px;
+        font-size: 14px;
+        font-weight: 500;
+        z-index: 999;
+        animation: toastIn 0.3s ease;
+        box-shadow: 0 12px 28px rgba(0, 0, 0, 0.3);
+        border-left: 6px solid #ff85c1;
+      }
+
+      @keyframes toastIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 960px) {
+        .layout {
+          grid-template-columns: 1fr;
+        }
+        .sidebar {
+          min-height: auto;
+        }
+        .summary-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 640px) {
+        .main {
+          padding: 24px 14px 30px;
+        }
+        .sidebar {
+          padding: 22px 14px;
+        }
+        th,
+        td {
+          padding: 14px 10px;
+        }
+        .actions {
+          flex-direction: column;
+        }
+        .btn-action {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <p class="sidebar-eyebrow">HR Member</p>
+          <h1>Team Control</h1>
+          <p>
+            Review volunteers, assign departments, and manage staff records.
+          </p>
+        </div>
+
+        <nav class="sidebar-nav">
+          <button class="nav-link active" type="button" data-page="pending">
+            Pending
+          </button>
+          <button class="nav-link" type="button" data-page="staff">
+            Staff
+          </button>
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="user-chip">
+            <div class="user-avatar" id="avatar-initials">H</div>
+            <div>
+              <div class="user-name" id="sidebar-name">HR Member</div>
+              <div class="user-role">HR Team</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- MAIN -->
+      <main class="main">
+        <header class="page-header">
+          <div>
+            <p class="eyebrow">HR Workspace</p>
+            <h2 id="page-title">Pending Volunteers</h2>
+            <p id="page-subtitle" class="page-subtitle">
+              Review volunteer requests and decide who joins the team.
+            </p>
+          </div>
+        </header>
+
+        <section class="summary-grid">
+          <article class="summary-card">
+            <span class="summary-label">Pending Requests</span>
+            <strong id="pending-count">0</strong>
+          </article>
+          <article class="summary-card">
+            <span class="summary-label">Staff Members</span>
+            <strong id="staff-count">0</strong>
+          </article>
+        </section>
+
+        <!-- Pending Panel -->
+        <section class="panel active" id="pendingPage">
+          <div class="panel-header">
+            <div>
+              <h3>Pending Volunteers</h3>
+              <p>
+                Accept or reject applications. Choose department when accepting.
+              </p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="pendingTable"></tbody>
+            </table>
+            <div class="empty-state" id="pending-empty">
+              <h3>No pending volunteers</h3>
+              <p>All requests are processed right now.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- Staff Panel -->
+        <section class="panel" id="staffPage">
+          <div class="panel-header">
+            <div>
+              <h3>Staff Members</h3>
+              <p>Update or delete staff entries from this page.</p>
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Phone</th>
+                  <th>Department</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="staffTable"></tbody>
+            </table>
+            <div class="empty-state" id="staff-empty">
+              <h3>No staff members found</h3>
+              <p>Add staff data later if needed.</p>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- MODALS -->
+    <!-- Edit Staff Modal -->
+    <div class="modal-overlay" id="edit-modal">
+      <div class="modal">
+        <div class="modal-title">Edit Staff Member</div>
+        <div class="modal-subtitle">
+          Update the details for this staff member.
+        </div>
+        <input type="hidden" id="edit-staff-id" />
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="edit-name" placeholder="John Doe" />
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="edit-email" placeholder="john@example.com" />
+        </div>
+        <div class="form-group">
+          <label>Phone</label>
+          <input type="tel" id="edit-phone" placeholder="+1 555 000 0000" />
+        </div>
+        <div class="form-group">
+          <label>Department (Role)</label>
+          <select id="edit-dept" disabled></select>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-ghost" onclick="closeModal('edit-modal')">
+            Cancel
+          </button>
+          <button
+            class="btn-primary"
+            id="btn-save-edit"
+            onclick="saveStaffEdit()"
+          >
+            Save Changes
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Accept Volunteer Modal (NEW) -->
+    <div class="modal-overlay" id="accept-modal">
+      <div class="modal">
+        <div class="modal-title">Accept Volunteer</div>
+        <div class="modal-subtitle" id="accept-volunteer-name">
+          Select department for this volunteer
+        </div>
+        <input type="hidden" id="accept-volunteer-id" />
+        <div class="form-group">
+          <label>Assign Department</label>
+          <select id="accept-dept-select"></select>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-ghost" onclick="closeModal('accept-modal')">
+            Cancel
+          </button>
+          <button class="btn-primary" onclick="confirmAcceptVolunteer()">
+            Confirm & Accept
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Confirm Delete Modal -->
+    <div class="modal-overlay" id="confirm-modal">
+      <div class="modal">
+        <div class="confirm-box">
+          <div class="confirm-icon">🗑️</div>
+          <div class="modal-title" id="confirm-title">Are you sure?</div>
+          <p class="confirm-msg" id="confirm-msg">
+            This action cannot be undone.
+          </p>
+          <div class="confirm-btns">
+            <button class="btn-ghost" onclick="closeModal('confirm-modal')">
+              Cancel
+            </button>
+            <button class="btn-action delete" id="confirm-yes">Delete</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        "use strict";
+
+        // ---------- CONFIG ----------
+        const BASE = "http://localhost:9090";
+        let hrId = null;
+        let hrName = "HR Member";
+        let DEPARTMENTS = [];
+        async function fetchDepartments() {
+          try {
+            const res = await fetch(`${BASE}/hr/staff-departments`);
+            if (!res.ok) throw new Error("Failed to load departments");
+            DEPARTMENTS = await res.json();
+            return DEPARTMENTS;
+          } catch (e) {
+            console.error(e);
+            return DEPARTMENTS;
+          }
+        }
+
+        function populateDeptSelect(selectElement, selectedValue = "") {
+          if (!selectElement) return;
+          selectElement.innerHTML = "";
+
+          const defaultOpt = document.createElement("option");
+          defaultOpt.value = "";
+          defaultOpt.textContent = "Select department";
+          selectElement.appendChild(defaultOpt);
+          DEPARTMENTS.forEach((dept) => {
+            const opt = document.createElement("option");
+            opt.value = dept;
+            opt.textContent = dept.replace(/_/g, " ");
+            if (dept === selectedValue) opt.selected = true;
+            selectElement.appendChild(opt);
+          });
+        }
+
+        try {
+          const stored = localStorage.getItem("user");
+          if (stored) {
+            const u = JSON.parse(stored);
+            hrId = u.id || 1;
+            hrName = u.name || "HR Member";
+            if (u.role && u.role !== "HR_MEMBER")
+              window.location.href = "login.html";
+          } else {
+            window.location.href = "login.html";
+          }
+        } catch (e) {
+          window.location.href = "login.html";
+        }
+
+        document.getElementById("sidebar-name").textContent = hrName;
+        document.getElementById("avatar-initials").textContent = hrName
+          .charAt(0)
+          .toUpperCase();
+
+        // ---------- HELPERS ----------
+        function deptLabel(d) {
+          if (!d) return "-";
+          return d.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+        }
+
+        function showToast(msg) {
+          const t = document.createElement("div");
+          t.className = "toast";
+          t.textContent = msg;
+          document.body.appendChild(t);
+          setTimeout(() => t.remove(), 3200);
+        }
+
+        window.closeModal = (id) => {
+          document.getElementById(id).classList.remove("open");
+        };
+
+        function openModal(id) {
+          document.getElementById(id).classList.add("open");
+        }
+
+        function loadingRow(colspan, msg = "Loading…") {
+          return `<tr class="loading-row"><td colspan="${colspan}">${msg}</td></tr>`;
+        }
+
+        const pages = {
+          pending: {
+            panelId: "pendingPage",
+            title: "Pending Volunteers",
+            subtitle:
+              "Review volunteer requests and decide who joins the team.",
+          },
+          staff: {
+            panelId: "staffPage",
+            title: "Staff Members",
+            subtitle: "Manage and update your staff records.",
+          },
+        };
+
+        document.querySelectorAll(".nav-link").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            document
+              .querySelectorAll(".nav-link")
+              .forEach((b) => b.classList.remove("active"));
+            document
+              .querySelectorAll(".panel")
+              .forEach((p) => p.classList.remove("active"));
+            btn.classList.add("active");
+            const page = pages[btn.dataset.page];
+            document.getElementById(page.panelId).classList.add("active");
+            document.getElementById("page-title").textContent = page.title;
+            document.getElementById("page-subtitle").textContent =
+              page.subtitle;
+          });
+        });
+
+        async function loadPending() {
+          const tbody = document.getElementById("pendingTable");
+          tbody.innerHTML = loadingRow(4);
+          try {
+            const res = await fetch(`${BASE}/volunteerAssignedToHr/${hrId}`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const volunteers = await res.json();
+            document.getElementById("pending-count").textContent =
+              volunteers.length;
+            renderPending(volunteers);
+          } catch (e) {
+            tbody.innerHTML = loadingRow(4, "Failed to load");
+            showToast("❌ Could not load pending volunteers");
+          }
+        }
+
+        function renderPending(volunteers) {
+          const tbody = document.getElementById("pendingTable");
+          const empty = document.getElementById("pending-empty");
+          if (!volunteers.length) {
+            tbody.innerHTML = "";
+            empty.classList.add("show");
+            return;
+          }
+          empty.classList.remove("show");
+          tbody.innerHTML = volunteers
+            .map(
+              (v) => `
+                <tr id="vol-row-${v.id}">
+                  <td>${v.name || v.fullName || "-"}</td>
+                  <td>${v.email || "-"}</td>
+                  <td>${v.phoneNumber || "-"}</td>
+                  <td>
+                    <div class="actions">
+                      <button class="btn-action accept" onclick="openAcceptModal(${v.id}, '${(v.name || v.fullName || "").replace(/'/g, "\\'")}')">✓ Accept</button>
+                      <button class="btn-action reject" onclick="rejectVolunteer(${v.id})">✕ Reject</button>
+                    </div>
+                  </td>
+                </tr>
+              `,
+            )
+            .join("");
+        }
+
+        window.openAcceptModal = function (volId, volName) {
+          document.getElementById("accept-volunteer-id").value = volId;
+          document.getElementById("accept-volunteer-name").textContent =
+            `Assign department for ${volName}`;
+          const select = document.getElementById("accept-dept-select");
+          populateDeptSelect(select);
+          openModal("accept-modal");
+        };
+
+        window.confirmAcceptVolunteer = async function () {
+          const volId = document.getElementById("accept-volunteer-id").value;
+          const deptSelect = document.getElementById("accept-dept-select");
+          const dept = deptSelect.value;
+
+          if (!dept) {
+            showToast("⚠️ Please select a department");
+            return;
+          }
+
+          closeModal("accept-modal");
+          const row = document.getElementById(`vol-row-${volId}`);
+          if (!row) return;
+          const btns = row.querySelectorAll("button");
+          btns.forEach((b) => (b.disabled = true));
+
+          try {
+            const res = await fetch(
+              `${BASE}/accept-volunteer/${volId}/${hrId}`,
+              {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(dept),
+              },
+            );
+            if (!res.ok) throw new Error(await res.text());
+            showToast("✅ Volunteer accepted");
+            row.remove();
+            updatePendingCount(-1);
+            loadStaff();
+          } catch (e) {
+            showToast("❌ " + e.message);
+            btns.forEach((b) => (b.disabled = false));
+          }
+        };
+
+        window.rejectVolunteer = async function (volId) {
+          const row = document.getElementById(`vol-row-${volId}`);
+          if (!row) return;
+          const btns = row.querySelectorAll("button");
+          btns.forEach((b) => (b.disabled = true));
+          try {
+            const res = await fetch(
+              `${BASE}/reject-volunteer/${volId}/${hrId}`,
+              { method: "POST" },
+            );
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            showToast("🗑️ Volunteer rejected");
+            row.remove();
+            updatePendingCount(-1);
+          } catch (e) {
+            showToast("❌ " + e.message);
+            btns.forEach((b) => (b.disabled = false));
+          }
+        };
+
+        function updatePendingCount(delta) {
+          const cntEl = document.getElementById("pending-count");
+          const newCnt = Math.max(
+            0,
+            parseInt(cntEl.textContent || "0") + delta,
+          );
+          cntEl.textContent = newCnt;
+          if (
+            newCnt === 0 &&
+            !document.getElementById("pendingTable").querySelector("tr")
+          ) {
+            document.getElementById("pending-empty").classList.add("show");
+          }
+        }
+
+        // ---------- STAFF ----------
+        async function loadStaff() {
+          const tbody = document.getElementById("staffTable");
+          tbody.innerHTML = loadingRow(5);
+          try {
+            const res = await fetch(`${BASE}/staff?hrId=${hrId}`);
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            const staff = await res.json();
+            document.getElementById("staff-count").textContent = staff.length;
+            renderStaff(staff);
+          } catch (e) {
+            tbody.innerHTML = loadingRow(5, "Failed to load");
+            showToast("❌ Could not load staff");
+          }
+        }
+
+        function renderStaff(staff) {
+          const tbody = document.getElementById("staffTable");
+          const empty = document.getElementById("staff-empty");
+          if (!staff.length) {
+            tbody.innerHTML = "";
+            empty.classList.add("show");
+            return;
+          }
+          empty.classList.remove("show");
+          tbody.innerHTML = staff
+            .map(
+              (s) => `
+                <tr id="staff-row-${s.id}">
+                  <td>${s.name || s.fullName || "-"}</td>
+                  <td>${s.email || "-"}</td>
+                  <td>${s.phone || s.phone || "-"}</td>
+                  <td><span class="badge dept-badge">${deptLabel(s.role || s.department)}</span></td>
+                  <td>
+                    <div class="actions">
+                      <button class="btn-action edit" onclick="openEditStaff(${s.id}, '${(s.name || s.fullName || "").replace(/'/g, "\\'")}', '${(s.email || "").replace(/'/g, "\\'")}', '${(s.phone || s.phone || "").replace(/'/g, "\\'")}', '${s.role || s.department || "TECH"}')">✏️ Edit</button>
+                      <button class="btn-action delete" onclick="confirmDeleteStaff(${s.id})">🗑 Delete</button>
+                    </div>
+                  </td>
+                </tr>
+              `,
+            )
+            .join("");
+        }
+
+        window.openEditStaff = function (id, name, email, phone, role) {
+          document.getElementById("edit-staff-id").value = id;
+          document.getElementById("edit-name").value = name;
+          document.getElementById("edit-email").value = email;
+          document.getElementById("edit-phone").value = phone;
+          const deptSelect = document.getElementById("edit-dept");
+          populateDeptSelect(deptSelect, role);
+          openModal("edit-modal");
+        };
+
+        window.saveStaffEdit = async function () {
+          const id = document.getElementById("edit-staff-id").value;
+          const name = document.getElementById("edit-name").value.trim();
+          const email = document.getElementById("edit-email").value.trim();
+          const phone = document.getElementById("edit-phone").value.trim();
+          const role = document.getElementById("edit-dept").value;
+          if (!name || !email) return showToast("⚠️ Name and email required");
+          const btn = document.getElementById("btn-save-edit");
+          btn.disabled = true;
+          btn.textContent = "Saving…";
+          try {
+            const res = await fetch(`${BASE}/staff/${id}?hrId=${hrId}`, {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ name, email, phone, role }),
+            });
+            if (!res.ok) throw new Error(await res.text());
+            showToast("✅ Staff updated");
+            closeModal("edit-modal");
+            loadStaff();
+          } catch (e) {
+            showToast("❌ " + e.message);
+          } finally {
+            btn.disabled = false;
+            btn.textContent = "Save Changes";
+          }
+        };
+
+        window.confirmDeleteStaff = (id) => {
+          document.getElementById("confirm-title").textContent =
+            "Delete Staff Member?";
+          document.getElementById("confirm-msg").textContent =
+            "This will permanently remove this staff member.";
+          document.getElementById("confirm-yes").onclick = async () => {
+            closeModal("confirm-modal");
+            try {
+              const res = await fetch(`${BASE}/staff/${id}?hrId=${hrId}`, {
+                method: "DELETE",
+              });
+              if (!res.ok) throw new Error(await res.text());
+              showToast("🗑️ Staff deleted");
+              loadStaff();
+            } catch (e) {
+              showToast("❌ " + e.message);
+            }
+          };
+          openModal("confirm-modal");
+        };
+
+        (async function init() {
+          await fetchDepartments();
+
+          const editDeptSelect = document.getElementById("edit-dept");
+          populateDeptSelect(editDeptSelect);
+          loadPending();
+          loadStaff();
+        })();
+      })();
+    </script>
+  </body>
+</html>
