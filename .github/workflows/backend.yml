@@ -33,20 +33,4 @@ jobs:
         working-directory: ./Backend
         run: mvn clean package -DskipTests
 
-  deploy-backend:
-    name: Deploy to Railway
-    needs: build-backend
-    if: github.event_name == 'push'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
 
-      - name: Install Railway CLI
-        run: npm i -g @railway/cli
-
-      - name: Deploy to Railway
-        working-directory: ./Backend
-        run: railway up --detach
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
