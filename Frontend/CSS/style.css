@@ -1,0 +1,193 @@
+body {
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  margin: 0;
+  direction: rtl;
+  text-align: right;
+  background: #fdfdfd;
+}
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 40px; 
+  background: #fff;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+.logo-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.main-logo-text {
+  font-size: 26px; 
+  font-weight: 900;
+  color: #e63946;
+}
+.heart-icon {
+  font-size: 28px;
+  animation: beat 0.8s infinite alternate;
+  display: inline-block;
+  filter: drop-shadow(0 0 2px white) drop-shadow(0 0 2px white) drop-shadow(0 0 2px white);
+}
+@keyframes beat {
+  to { transform: scale(1.15); }
+}
+.nav-links {
+  list-style: none;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+.nav-item {
+  text-decoration: none;
+  color: #333;
+  font-weight: 600;
+  padding: 8px 12px;
+  border-radius: 25px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 14px; 
+  transition: 0.3s;
+}
+.btn-v { background: #f1f1f1; }
+.btn-l { background: #1d3557; color: white !important; }
+.btn-donate-main {
+  background: linear-gradient(45deg, #e63946, #b91c1c);
+  color: white;
+  border: none;
+  padding: 12px 30px; 
+  border-radius: 40px;
+  font-size: 18px; 
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3);
+  transition: 0.3s;
+  text-decoration: none;
+}
+.btn-donate-main:hover { transform: scale(1.05); }
+.hero {
+  height: 35vh; 
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url("../Images/home-hero.jpg");
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  text-align: center;
+}
+.sub-nav {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+  padding: 18px 40px;
+  background: white;
+  width: fit-content;
+  margin: -25px auto 20px;
+  border-radius: 80px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+.sub-link {
+  text-decoration: none;
+  color: #1d3557;
+  font-weight: bold;
+  font-size: 16px;
+}
+.content-box {
+  max-width: 850px; 
+  margin: 25px auto;
+  padding: 30px;
+  background: white;
+  border-radius: 20px;
+  line-height: 1.7;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+.content-box h1 {
+  color: #e63946;
+  font-size: 28px;
+  border-left: 4px solid #e63946;
+  padding-right: 12px;
+}
+input, select, .btn-submit-step {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  font-size: 15px;
+}
+.btn-submit-step {
+  background: #e63946;
+  color: white;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 8px;
+  margin: 15px 0;
+}
+.day {
+  padding: 10px 4px;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  font-weight: bold;
+  border: 1px solid #eee;
+  font-size: 14px;
+}
+.available { background: #d4edda; color: #155724; border-color: #c3e6cb; }
+.disabled { background: #e9ecef; color: #adb5bd; cursor: not-allowed; }
+.selected { background: #e63946 !important; color: white !important; }
+.time-slots {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.slot {
+  padding: 6px 15px;
+  border: 1px solid #ddd;
+  border-radius: 18px;
+  cursor: pointer;
+  background: white;
+  font-size: 14px;
+}
+.images-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin: 20px 0;
+}
+.images-grid-3 {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  margin: 20px 0;
+}
+.grid-img {
+  width: 100%;
+  border-radius: 15px;
+  object-fit: cover;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+.long-img {
+  height: 320px !important;
+  object-fit: cover;
+}
+.hadeer {
+  color: #e63946;
+  font-size: 26px;
+  font-weight: 900;
+  margin: 0;
+  padding: 0;
+  font-family: "Segoe UI", Tahoma, sans-serif;
+  letter-spacing: -1px;
+}
