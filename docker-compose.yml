@@ -2,18 +2,15 @@ version: '3.8'
 
 services:
   database:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: sql_server_db
-    user: "0:0"
+    image: mysql:8
+    container_name: mysql_db
     environment:
-      - ACCEPT_EULA=Y
-      - SA_PASSWORD=StrongPassword@123
-      - MSSQL_PID=Express
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=MisrShoryanElAtaa
     ports:
-      - "1433:1433"
+      - "3306:3306"
     volumes:
-      - sqldata:/var/opt/mssql/data
-      - sqllog:/var/opt/mssql/log
+      - mysqldata:/var/lib/mysql
     restart: unless-stopped
 
   backend:
@@ -24,9 +21,9 @@ services:
     ports:
       - "9090:9090"
     environment:
-      - SPRING_DATASOURCE_URL=jdbc:sqlserver://database:1433;databaseName=MisrShoryanElAtaa;encrypt=true;trustServerCertificate=true;sendStringParametersAsUnicode=true
-      - SPRING_DATASOURCE_USERNAME=sa
-      - SPRING_DATASOURCE_PASSWORD=StrongPassword@123
+      - SPRING_DATASOURCE_URL=jdbc:mysql://database:3306/MisrShoryanElAtaa?useSSL=false&serverTimezone=UTC
+      - SPRING_DATASOURCE_USERNAME=root
+      - SPRING_DATASOURCE_PASSWORD=root
     depends_on:
       - database
     restart: unless-stopped
@@ -41,5 +38,4 @@ services:
     restart: unless-stopped
 
 volumes:
-  sqldata:
-  sqllog:
+  mysqldata:
