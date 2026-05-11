@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sql_server_db
+    user: "0:0"
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=StrongPassword@123
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqldata:/var/opt/mssql/data
+      - sqllog:/var/opt/mssql/log
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./Backend
+      dockerfile: Dockerfile
+    container_name: spring_backend
+    ports:
+      - "9090:9090"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:sqlserver://database:1433;databaseName=MisrShoryanElAtaa;encrypt=true;trustServerCertificate=true;sendStringParametersAsUnicode=true
+      - SPRING_DATASOURCE_USERNAME=sa
+      - SPRING_DATASOURCE_PASSWORD=StrongPassword@123
+    depends_on:
+      - database
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./Frontend
+      dockerfile: Dockerfile
+    container_name: static_frontend
+    ports:
+      - "80:80"
+    restart: unless-stopped
+
+volumes:
+  sqldata:
+  sqllog:
