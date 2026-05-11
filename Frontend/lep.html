@@ -1,0 +1,2954 @@
+<!doctype html>
+<html lang="ar" dir="ltr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>LEP Dashboard</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #f7f6f2;
+        --surface: #ffffff;
+        --surface2: #f0efe9;
+        --border: #e2e0d8;
+        --border2: #cccab8;
+        --text: #1a1916;
+        --text2: #6b6960;
+        --text3: #9e9c93;
+        --purple: #f472b6;
+        --purple-light: #fce7f3;
+        --purple-mid: #fbcfe8;
+        --green: #2e7d5e;
+        --green-light: #e8f5ee;
+        --red: #c0392b;
+        --red-light: #fdecea;
+        --amber: #b45309;
+        --amber-light: #fef3c7;
+        --blue: #1d5fa8;
+        --blue-light: #dbeafe;
+        --radius: 10px;
+        --radius-lg: 14px;
+        --shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        font-family: "DM Sans", sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        font-size: 14px;
+        line-height: 1.5;
+        min-height: 100vh;
+      }
+      .layout {
+        display: flex;
+        min-height: 100vh;
+      }
+select {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  background-color: #ffffff;
+  font-size: 13px;
+  cursor: pointer;
+  transition: 0.2s ease;
+  min-width: 110px;
+}
+
+select:hover {
+  border-color: #3b82f6;
+}
+
+select:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}button {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  border: none;
+  transition: 0.2s ease;
+}
+
+/* Delete button */
+button {
+  background-color: #ef4444;
+  color: white;
+}
+
+button:hover {
+  background-color: #dc2626;
+  transform: scale(1.03);
+}
+
+button:active {
+  transform: scale(0.97);
+}
+      /* SIDEBAR */
+      .sidebar {
+        width: 220px;
+        background: var(--surface);
+        border-right: 1px solid var(--border);
+        display: flex;
+        flex-direction: column;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        z-index: 100;
+      }
+      .sidebar-brand {
+        padding: 24px 20px 20px;
+        border-bottom: 1px solid var(--border);
+      }
+      .brand-logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .brand-icon {
+        width: 32px;
+        height: 32px;
+        background: var(--purple);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 15px;
+        font-weight: 600;
+        font-family: "DM Mono", monospace;
+      }
+      .brand-name {
+        font-size: 15px;
+        font-weight: 600;
+        color: var(--text);
+      }
+      .brand-sub {
+        font-size: 11px;
+        color: var(--text3);
+        margin-top: 1px;
+      }
+      .sidebar-nav {
+        padding: 12px 10px;
+        flex: 1;
+      }
+      .nav-section-label {
+        font-size: 10px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text3);
+        padding: 8px 10px 4px;
+      }
+      .nav-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 12px;
+        border-radius: var(--radius);
+        cursor: pointer;
+        color: var(--text2);
+        font-size: 13.5px;
+        transition: all 0.15s;
+        margin-bottom: 1px;
+        border: none;
+        background: none;
+        width: 100%;
+        text-align: left;
+      }
+      .nav-item:hover {
+        background: var(--surface2);
+        color: var(--text);
+      }
+      .nav-item.active {
+        background: var(--purple-light);
+        color: var(--purple);
+        font-weight: 500;
+      }
+      .nav-icon {
+        width: 16px;
+        text-align: center;
+        font-size: 15px;
+        flex-shrink: 0;
+      }
+      .nav-badge {
+        margin-left: auto;
+        background: var(--purple);
+        color: white;
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 7px;
+        border-radius: 99px;
+        font-family: "DM Mono", monospace;
+      }
+      .loader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        font-size: 24px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      }
+
+      .hidden {
+        display: none;
+      }
+      .sidebar-footer {
+        padding: 16px 20px;
+        border-top: 1px solid var(--border);
+      }
+      .user-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .user-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: var(--purple-mid);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--purple);
+      }
+      .user-name {
+        font-size: 13px;
+        font-weight: 500;
+      }
+      .user-role {
+        font-size: 11px;
+        color: var(--text3);
+      }
+
+      /* MAIN */
+      .main {
+        margin-left: 220px;
+        flex: 1;
+        min-height: 100vh;
+      }
+      .topbar {
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        padding: 0 28px;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: sticky;
+        top: 0;
+        z-index: 50;
+      }
+      .topbar-title {
+        font-size: 16px;
+        font-weight: 600;
+      }
+      .topbar-actions {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+      }
+      .content {
+        padding: 28px;
+      }
+
+      /* PAGES */
+      .page {
+        display: none;
+      }
+      .page.active {
+        display: block;
+      }
+
+      /* METRIC CARDS */
+      .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin-bottom: 28px;
+      }
+      .metric-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 18px 20px;
+        box-shadow: var(--shadow);
+      }
+      .metric-label {
+        font-size: 12px;
+        color: var(--text3);
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        margin-bottom: 8px;
+      }
+      .metric-value {
+        font-size: 28px;
+        font-weight: 600;
+        color: var(--text);
+        font-family: "DM Mono", monospace;
+        line-height: 1;
+      }
+      .metric-sub {
+        font-size: 12px;
+        color: var(--text3);
+        margin-top: 4px;
+      }
+      .metric-card.accent-purple {
+        border-left: 3px solid var(--purple);
+      }
+      .metric-card.accent-green {
+        border-left: 3px solid var(--green);
+      }
+      .metric-card.accent-amber {
+        border-left: 3px solid var(--amber);
+      }
+      .metric-card.accent-red {
+        border-left: 3px solid var(--red);
+      }
+
+      /* GRID 2-COL */
+      .two-col {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+      .full-col {
+        grid-column: 1 / -1;
+      }
+
+      /* CARD */
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        margin-bottom: 65px;
+      }
+      .card-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .card-title {
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .card-body {
+        padding: 20px;
+      }
+
+      /* TABLE */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      thead th {
+        text-align: left;
+        padding: 10px 14px;
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--text3);
+        background: var(--surface2);
+        border-bottom: 1px solid var(--border);
+      }
+      tbody td {
+        padding: 11px 14px;
+        border-bottom: 1px solid var(--border);
+        font-size: 13.5px;
+        color: var(--text);
+      }
+      tbody tr:last-child td {
+        border-bottom: none;
+      }
+      tbody tr:hover td {
+        background: var(--surface2);
+      }
+
+      /* BADGES */
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px 10px;
+        border-radius: 99px;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.02em;
+      }
+      .badge-pending {
+        background: var(--amber-light);
+        color: var(--amber);
+      }
+      .badge-accepted {
+        background: var(--green-light);
+        color: var(--green);
+      }
+      .badge-rejected {
+        background: var(--red-light);
+        color: var(--red);
+      }
+      .badge-onetime {
+        background: var(--blue-light);
+        color: var(--blue);
+      }
+      .badge-repeat {
+        background: var(--purple-light);
+        color: var(--purple);
+      }
+
+      /* BUTTONS */
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 14px;
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        background: var(--surface);
+        color: var(--text);
+        font-size: 12.5px;
+        font-weight: 500;
+        font-family: "DM Sans", sans-serif;
+        cursor: pointer;
+        transition: all 0.15s;
+        white-space: nowrap;
+      }
+      .btn:hover {
+        background: var(--surface2);
+        border-color: var(--border2);
+      }
+      .btn-sm {
+        padding: 4px 10px;
+        font-size: 12px;
+      }
+      .btn-primary {
+        background: var(--purple);
+        color: white;
+        border-color: var(--purple);
+      }
+      .btn-primary:hover {
+        background: #5a4dcf;
+        border-color: #5a4dcf;
+      }
+      .btn-success {
+        background: var(--green-light);
+        color: var(--green);
+        border-color: #a7d4bc;
+      }
+      .btn-success:hover {
+        background: #d4eddf;
+      }
+      .btn-danger {
+        background: var(--red-light);
+        color: var(--red);
+        border-color: #f5bbb6;
+      }
+      .btn-danger:hover {
+        background: #fbd5d2;
+      }
+      .btn-info {
+        background: var(--blue-light);
+        color: var(--blue);
+        border-color: #b3d1f5;
+      }
+      .btn-info:hover {
+        background: #cce2fb;
+      }
+      .btn-full {
+        width: 100%;
+        justify-content: center;
+        padding: 10px;
+        font-size: 14px;
+      }
+      .btn-group {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+      }
+
+      /* TABS */
+      .tabs {
+        display: flex;
+        gap: 4px;
+        margin-bottom: 20px;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 0;
+      }
+      .tab-btn {
+        padding: 8px 18px;
+        border: none;
+        background: none;
+        font-family: "DM Sans", sans-serif;
+        font-size: 13.5px;
+        color: var(--text2);
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -1px;
+        transition: all 0.15s;
+        font-weight: 500;
+      }
+      .tab-btn:hover {
+        color: var(--text);
+      }
+      .tab-btn.active {
+        color: var(--purple);
+        border-bottom-color: var(--purple);
+      }
+      .tab-content {
+        display: none;
+      }
+      .tab-content.active {
+        display: block;
+      }
+
+      /* FORM */
+      .form-group {
+        margin-bottom: 18px;
+      }
+      .form-label {
+        display: block;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--text2);
+        margin-bottom: 6px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .form-input,
+      .form-select {
+        width: 100%;
+        padding: 9px 12px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--surface);
+        color: var(--text);
+        font-family: "DM Sans", sans-serif;
+        font-size: 14px;
+        transition: border-color 0.15s;
+        outline: none;
+      }
+      .form-input:focus,
+      .form-select:focus {
+        border-color: var(--purple);
+        box-shadow: 0 0 0 3px rgba(107, 92, 231, 0.1);
+      }
+
+      /* CHECKBOX DONORS */
+      .donor-checkbox-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        max-height: 300px;
+        overflow-y: auto;
+      }
+      .donor-check-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 14px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        cursor: pointer;
+        background: var(--surface);
+        transition: all 0.12s;
+        user-select: none;
+         justify-content: space-between;
+      }
+      .donor-check-item:hover {
+        border-color: var(--purple-mid);
+        background: var(--purple-light);
+      }
+      .donor-check-item.checked {
+        border-color: var(--purple);
+        background: var(--purple-light);
+      }
+      .check-box {
+        width: 18px;
+        height: 18px;
+        border: 1.5px solid var(--border2);
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 11px;
+        color: white;
+        transition: all 0.12s;
+         margin-left: auto;
+      }
+      .checked .check-box {
+        background: var(--purple);
+        border-color: var(--purple);
+      }
+      .donor-check-name {
+        font-size: 13.5px;
+        font-weight: 500;
+        flex: 1;
+      }
+      .donor-check-blood {
+        font-size: 12px;
+        background: var(--surface2);
+        padding: 2px 8px;
+        border-radius: 99px;
+        color: var(--text2);
+        font-family: "DM Mono", monospace;
+      }
+      .selection-hint {
+        font-size: 12.5px;
+        color: var(--text3);
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .selection-counter {
+        font-family: "DM Mono", monospace;
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--purple);
+      }
+
+      /* CHILD CARDS */
+      .child-list {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .child-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 16px 20px;
+        box-shadow: var(--shadow);
+      }
+      .child-card-top {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 12px;
+      }
+      .child-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--purple-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        font-weight: 600;
+        color: var(--purple);
+        flex-shrink: 0;
+        margin-right: 12px;
+      }
+      .child-info-row {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+      }
+      .child-name {
+        font-size: 15px;
+        font-weight: 600;
+        margin-bottom: 3px;
+      }
+      .child-meta {
+        font-size: 12px;
+        color: var(--text3);
+      }
+      .child-groups {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        padding-top: 12px;
+        border-top: 1px solid var(--border);
+      }
+      .group-pill {
+        font-size: 12px;
+        padding: 4px 12px;
+        background: var(--surface2);
+        border: 1px solid var(--border);
+        border-radius: 99px;
+        color: var(--text2);
+      }
+
+      /* GROUP CARDS */
+      .group-card-list {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+      }
+      .group-card2 {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+      .group-card2-header {
+        padding: 14px 18px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--surface2);
+      }
+      .group-card2-title {
+        font-size: 14px;
+        font-weight: 600;
+      }
+      .group-child-badge {
+        font-size: 12px;
+        background: var(--blue-light);
+        color: var(--blue);
+        padding: 3px 12px;
+        border-radius: 99px;
+        font-weight: 500;
+      }
+      .member-list {
+        padding: 0 18px;
+      }
+      .member-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border);
+      }
+      .member-row:last-child {
+        border-bottom: none;
+      }
+      .member-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .member-avatar {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        background: var(--green-light);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--green);
+      }
+      .member-name {
+        font-size: 13.5px;
+        font-weight: 500;
+      }
+      .member-blood {
+        font-size: 11px;
+        color: var(--text3);
+        font-family: "DM Mono", monospace;
+      }
+      .group-card2-footer {
+        padding: 12px 18px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .group-member-count {
+        font-size: 12px;
+        color: var(--text3);
+      }
+
+      /* MODAL */
+      .modal-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.35);
+        z-index: 200;
+        align-items: center;
+        justify-content: center;
+      }
+      .modal-overlay.open {
+        display: flex;
+      }
+      .modal {
+        background: var(--surface);
+        border-radius: var(--radius-lg);
+        border: 1px solid var(--border);
+        width: 420px;
+        max-width: 90vw;
+        max-height: 90vh;
+        overflow-y: auto;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+        overflow: hidden;
+      }
+      .modal-header {
+        padding: 16px 20px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .modal-title {
+        font-size: 15px;
+        font-weight: 600;
+      }
+      .modal-close {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 18px;
+        color: var(--text3);
+        padding: 0;
+        line-height: 1;
+      }
+      .modal-body {
+        padding: 20px;
+      }
+      .modal-footer {
+        padding: 14px 20px;
+        border-top: 1px solid var(--border);
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+      }
+
+      /* ALERT */
+      .alert {
+        padding: 10px 14px;
+        border-radius: var(--radius);
+        font-size: 13px;
+        margin-top: 12px;
+        display: none;
+      }
+      .alert-error {
+        background: var(--red-light);
+        color: var(--red);
+        border: 1px solid #f5bbb6;
+      }
+      .alert-success {
+        background: var(--green-light);
+        color: var(--green);
+        border: 1px solid #a7d4bc;
+      }
+      .alert.show {
+        display: block;
+      }
+
+      /* EMPTY STATE */
+      .empty-state {
+        text-align: center;
+        padding: 48px 20px;
+        color: var(--text3);
+      }
+      .empty-state-icon {
+        font-size: 36px;
+        margin-bottom: 12px;
+      }
+      .empty-state-text {
+        font-size: 14px;
+      }
+
+      /* SECTION HEADER */
+      .section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+      }
+      .section-title {
+        font-size: 15px;
+        font-weight: 600;
+      }
+
+      /* SCROLLBAR */
+      ::-webkit-scrollbar {
+        width: 5px;
+        height: 5px;
+      }
+      ::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: var(--border2);
+        border-radius: 99px;
+      }
+
+      /* RESPONSIVE */
+      @media (max-width: 900px) {
+        .metrics-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .two-col {
+          grid-template-columns: 1fr;
+        }
+      }
+      #toast-container {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+      }
+
+      .toast {
+        min-width: 250px;
+        margin-bottom: 10px;
+        padding: 12px 16px;
+        border-radius: 8px;
+        color: white;
+        font-family: Arial;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        animation:
+          slideIn 0.3s ease,
+          fadeOut 0.5s ease 2.5s forwards;
+      }
+
+      .toast.success {
+        background: #28a745;
+      }
+
+      .toast.error {
+        background: #dc3545;
+      }
+
+      @keyframes slideIn {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes fadeOut {
+        to {
+          opacity: 0;
+          transform: translateX(100%);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="layout">
+      <!-- SIDEBAR -->
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <div class="brand-logo">
+            <div class="brand-icon">L</div>
+            <div>
+              <div class="brand-name">LEP System</div>
+              <div class="brand-sub">Donor Management</div>
+            </div>
+          </div>
+        </div>
+        <nav class="sidebar-nav">
+          <div class="nav-section-label">Main</div>
+          <button class="nav-item active" onclick="showPage('dashboard', this)">
+            <span class="nav-icon">◈</span> Dashboard
+            <span class="nav-badge" id="pending-badge">5</span>
+          </button>
+          <button class="nav-item" onclick="showPage('donors', this)">
+            <span class="nav-icon">◎</span> Donors
+          </button>
+          <button class="nav-item" onclick="showPage('children', this)">
+            <span class="nav-icon">◉</span> Children
+          </button>
+          <div class="nav-section-label" style="margin-top: 8px">Groups</div>
+          <button class="nav-item" onclick="showPage('groups', this)">
+            <span class="nav-icon">⊞</span> All Groups
+          </button>
+          <button
+            class="nav-item"
+            id="nav-create-group"
+            onclick="showPage('create-group', this)"
+          >
+            <span class="nav-icon">⊕</span> Create Group
+          </button>
+        </nav>
+        <div class="sidebar-footer">
+          <div class="user-row">
+            <div class="user-avatar">ME</div>
+            <div>
+              <!-- <div class="user-name">Dr. Mona Emad</div> -->
+              <div class="user-role">LEP</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- EDIT CHILD MODAL -->
+      <div class="modal-overlay" id="edit-child-modal">
+        <div class="modal">
+          <div class="modal-header">
+            <div class="modal-title">Edit Child</div>
+            <button class="modal-close" onclick="closeEditChild()">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label class="form-label">Name</label>
+              <input type="text" id="ec-name" class="form-input" />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Age</label>
+              <input type="number" id="ec-age" class="form-input" />
+            </div>
+            <label class="form-label">Blood Type</label>
+            <select class="form-select" id="ec-blood"  disabled>
+              <option value="" >Blood Types</option>
+            </select>
+            <div class="form-group">
+              <label class="form-label">Parent Number</label>
+              <input
+                class="form-input"
+                id="ec-parent-number"
+                placeholder="e.g. 01234567890"
+              />
+            </div>
+            <!-- <div class="form-group">
+              <label class="form-label">Assign to Groups</label>
+              <p
+                style="
+                  font-size: 12px;
+                  color: var(--text3);
+                  margin-bottom: 10px;
+                "
+              >
+                Select groups to assign this child to:
+              </p>
+              <div
+                class="donor-checkbox-list"
+                id="ec-groups-list"
+                style="max-height: 200px"
+              >
+             
+              </div>
+            </div> -->
+            <div id="ec-alert" class="alert"></div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn" onclick="closeEditChild()">Cancel</button>
+            <button class="btn btn-primary" onclick="updateChild()">
+              Save
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADD CHILD MODAL -->
+      <div class="modal-overlay" id="add-child-modal">
+        <div class="modal">
+          <div class="modal-header">
+            <div class="modal-title">Add Child</div>
+            <button class="modal-close" onclick="closeAddChild()">✕</button>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <label class="form-label">Name</label>
+              <input
+                class="form-input"
+                id="ac-name"
+                placeholder="Child's full name"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Age</label>
+              <input
+                class="form-input"
+                id="ac-age"
+                placeholder="Age"
+                type="number"
+              />
+            </div>
+            <div class="form-group">
+              <label class="form-label">Blood Type</label>
+              <select class="form-select" id="ac-blood">
+                <option value="" disabled selected>Blood Types</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Parent Number</label>
+              <input
+                class="form-input"
+                id="ac-parent-number"
+                placeholder="e.g. 01234567890"
+              />
+            </div>
+
+            <div id="ac-alert" class="alert"></div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn" onclick="closeAddChild()">Cancel</button>
+            <button class="btn btn-primary" onclick="addChild()">
+              Add Child
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ADD DONOR TO GROUP MODAL -->
+      <div class="modal-overlay" id="add-donor-modal">
+        <div class="modal">
+          <div class="modal-header">
+            <div class="modal-title">Add Donor to Group</div>
+            <button class="modal-close" onclick="closeAddDonorModal()">
+              ✕
+            </button>
+          </div>
+          <div class="modal-body">
+            <p
+              style="font-size: 13px; color: var(--text2); margin-bottom: 14px"
+            >
+              Select a donor to add to this group:
+            </p>
+            <div class="donor-checkbox-list" id="add-donor-list">
+              <!-- Populated dynamically -->
+            </div>
+            <div id="add-donor-alert" class="alert"></div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn" onclick="closeAddDonorModal()">Cancel</button>
+            <button class="btn btn-primary" onclick="confirmAddDonor()">
+              Add Donor
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- MAIN CONTENT -->
+      <main class="main">
+        <div class="topbar">
+          <div class="topbar-title" id="topbar-title">Dashboard</div>
+          <div class="topbar-actions">
+            <button class="btn btn-sm">🔔 Notifications</button>
+          </div>
+        </div>
+        <div class="content">
+          <!-- ===== DASHBOARD PAGE ===== -->
+          <div class="page active" id="p-dashboard">
+            <div class="metrics-grid">
+              <div class="metric-card accent-purple">
+                <div class="metric-label">Total Donors</div>
+                <div class="metric-value" id="m-total">0</div>
+                <div class="metric-sub">Registered in system</div>
+              </div>
+              <div class="metric-card accent-amber">
+                <div class="metric-label">Pending Review</div>
+                <div class="metric-value" id="m-pending">0</div>
+                <div class="metric-sub">Awaiting checkup result</div>
+              </div>
+              <div class="metric-card accent-green">
+                <div class="metric-label">Accepted Donors</div>
+                <div class="metric-value" id="m-accepted">0</div>
+                <div class="metric-sub">Ready for donation</div>
+              </div>
+              <div class="metric-card accent-red">
+                <div class="metric-label">Active Groups</div>
+                <div class="metric-value" id="m-groups">0</div>
+                <div class="metric-sub">Across children</div>
+              </div>
+            </div>
+
+            <div class="two-col">
+              <div class="card full-col">
+                <div class="card-header">
+                  <div class="card-title">Pending Donors — Awaiting Action</div>
+                  <span class="badge badge-pending" id="dash-pending-badge"
+                    >0 pending</span
+                  >
+                </div>
+                <table id="dash-pending-table">
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Blood Type</th>
+                      <th>Checkup Date</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== DONORS PAGE ===== -->
+          <div class="page" id="p-donors">
+            <div class="tabs">
+              <button
+                class="tab-btn active"
+                onclick="switchTab(this, 't-accepted')"
+              >
+                Accepted
+              </button>
+              <button class="tab-btn" onclick="switchTab(this, 't-pending')">
+                Pending
+              </button>
+            </div>
+
+            <div class="tab-content active" id="t-accepted">
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">Accepted Repeat Donors</div>
+                  <span
+                    class="badge badge-accepted"
+                    id="donors-accepted-Repeat-badge"
+                  >
+                    0
+                  </span>
+                </div>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Blood Type</th>
+                     
+                      <th>Status</th>
+                       <th>Type</th>
+
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="t-accepted-repeat-tbody"></tbody>
+                </table>
+              </div>
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">Accepted One-Time Donors</div>
+                  <span
+                    class="badge badge-accepted"
+                    id="donors-accepted-OneTime-badge"
+                  >
+                    0
+                  </span>
+                </div>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Blood Type</th>
+                      
+
+                      <th>Status</th>
+                      <th>Type</th>
+                       <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="t-accepted-onetime-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="tab-content" id="t-pending">
+              <div class="card">
+                <div class="card-header">
+                  <div class="card-title">Pending Donors</div>
+                  <span class="badge badge-pending" id="donors-pending-badge"
+                    >0</span
+                  >
+                </div>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Name</th>
+                      <th>Blood Type</th>
+                      <th>Donation Type</th>
+                      <th>Checkup Date</th>
+                      <th>Status</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody id="donors-pending-tbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== CHILDREN PAGE ===== -->
+          <div class="page" id="p-children">
+            <div class="section-header">
+              <div class="section-title">Children</div>
+              <button class="btn btn-primary" onclick="openAddChildModal()">
+                + Add Child
+              </button>
+            </div>
+            <div class="child-list" id="child-list"></div>
+          </div>
+
+          <!-- ===== GROUPS PAGE ===== -->
+<div class="page" id="p-groups">
+  <div class="section-header">
+    <div class="section-title">All Groups</div>
+
+    <button
+      class="btn btn-primary"
+      onclick="showPage('create-group', document.getElementById('nav-create-group'))"
+    >
+      + Create Group
+    </button>
+  </div>
+
+  <!-- 🔥 Dynamic groups will be injected here -->
+  <div class="group-card-list" id="group-card-list">
+    <!-- JS RENDERS EVERYTHING HERE -->
+  </div>
+</div>
+        
+          <!-- ===== CREATE GROUP PAGE ===== -->
+     <div class="page" id="p-create-group">
+    <div class="section-header">
+      <div class="section-title">Create New Group</div>
+    </div>
+    <div style="width:100%">
+      <div class="card">
+        <div class="card-body">
+ 
+          <div class="form-group">
+            <label class="form-label">Select Child</label>
+            <select class="form-select" id="cg-child" onchange="onChildChange()">
+              <option value="">— Choose a child —</option>
+              <!-- populated dynamically -->
+            </select>
+          </div>
+ 
+          <div class="form-group">
+            <label class="form-label">Select Donors</label>
+            <div class="selection-hint">
+              <span>Select between 3 and 6 donors</span>
+              <span class="selection-counter">
+                <span id="cg-count">0</span> / 6 selected
+              </span>
+            </div>
+            <div class="donor-checkbox-list" id="cg-donor-list">
+              <!-- populated dynamically after child is chosen -->
+            </div>
+          </div>
+ 
+          <div id="cg-alert" class="alert"></div>
+ 
+          <button
+            class="btn btn-primary btn-full"
+            onclick="createGroup()"
+            style="margin-top: 8px"
+          >
+            Create Group
+          </button>
+ 
+        </div>
+      </div>
+    </div>
+  </div>
+     
+        <!-- /content -->
+      </main>
+    </div>
+    <!-- DONATION LIFECYCLE MODAL -->
+<!-- DONATION LIFECYCLE MODAL -->
+<div class="modal-overlay" id="lifecycle-modal">
+  <div class="modal" style="width:500px; max-height:85vh; overflow-y:auto;">
+    <div class="modal-header">
+      <div class="modal-title" id="lifecycle-modal-title">Donation Life Cycle</div>
+      <button class="modal-close" onclick="closeLifecycleModal()">✕</button>
+    </div>
+    <div class="modal-body" id="lifecycle-modal-body"></div>
+    <!-- <div class="modal-footer">
+      <button class="btn" onclick="closeLifecycleModal()">Close</button>
+    </div> -->
+  </div>
+</div>
+    <div id="toast-container"></div>
+    <div id="global-loader" class="loader hidden">Processing...</div>
+
+    <script>
+      const API_BASE = 'http://localhost:9090';
+      // ================= USER CHECK =================
+      let lepId, lepName;
+
+      try {
+        const stored = localStorage.getItem("user");
+        if (stored) {
+          const u = JSON.parse(stored);
+          lepId = u.id || 1;
+          lepName = u.name || "LEP";
+
+          if (!u.role || u.role !== "LEP") {
+            window.location.href = "login.html";
+          }
+        } else {
+          window.location.href = "login.html";
+        }
+      } catch {
+        window.location.href = "login.html";
+      }
+async function openLifecycleModal(group) {
+const response = await fetch(
+  `http://localhost:9090/donGroup/getCurrentDonors/${group.id}`
+);
+
+const res = await response.json(); // ✅ FIX
+
+const current = res[0] || null;
+const backup  = res[1] || null;
+  const donorBlock = (d, type) => {
+    const isMain  = type === 'current';
+    const bg      = isMain ? '#e8f8ef'  : '#fff8e1';
+    const border  = isMain ? '#1e7e4a'  : '#c67c00';
+    const label   = isMain ? '⭐ Current Donor' : '🔁 Backup Donor';
+    return `
+      <div style="
+        padding:12px; border-radius:10px; margin-bottom:10px;
+        background:${bg}; border-left:5px solid ${border};
+      ">
+        <div style="font-weight:bold;font-size:14px;margin-bottom:6px">${label}</div>
+        <div style="font-size:12px;color:#555;line-height:1.8">
+          Name: ${d.name}<br/>
+          Blood Type: ${d.bloodType || '—'}<br/>
+          Email: ${d.email || '—'}<br/>
+          Phone: ${d.phone || d.phoneNumber || '—'}
+        </div>
+      </div>`;
+  };
+
+  const emptyBlock = `<div style="color:gray;font-size:13px">No donors available</div>`;
+
+  let donorUI = '';
+  if (!current && !backup) {
+    donorUI = emptyBlock;
+  } else {
+    if (current) donorUI += donorBlock(current, 'current');
+    if (backup)  donorUI += donorBlock(backup,  'backup');
+  }
+
+  document.getElementById('lifecycle-modal-body').innerHTML = `
+    <div style="
+      background:white; border-radius:14px; padding:18px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.08);
+    ">
+      <h3 style="margin-bottom:6px">${group.child?.name || 'Child'}</h3>
+
+      <div style="font-size:13px;color:#666;margin-bottom:12px">
+        👶 <b >Child:</b> ${group.child?.name  || '—'} | 
+        🩸<b> Blood:</b> ${group.child?.bloodType || '—'}  |
+        👥<b> Donors: </b>${group.donorsCount}
+      </div>
+
+      <div style="font-size:12px;color:gray;margin-bottom:6px">Current Assignment</div>
+
+      ${donorUI}
+    </div>`;
+
+  document.getElementById('lifecycle-modal-title').textContent =
+    `Life Cycle — ${group.child?.name || 'Group'}`;
+  document.getElementById('lifecycle-modal').classList.add('open');
+}
+
+function closeLifecycleModal() {
+  document.getElementById('lifecycle-modal').classList.remove('open');
+}  
+async function loadDashboardMetrics() {
+        try {
+          const [pendingRes, repeatRes, oneTimeRes,groupRes] = await Promise.all([
+            fetch("http://localhost:9090/donGroup/pending-donors"),
+            fetch("http://localhost:9090/donGroup/acceptedRepeat-donors"),
+            fetch("http://localhost:9090/donGroup/acceptedOneTime-donors"),
+            fetch(`http://localhost:9090/donGroup/all/${lepId}`)
+          ]);
+
+          const pending = await pendingRes.json();
+          const repeat = await repeatRes.json();
+          const oneTime = await oneTimeRes.json();
+          const groups=await groupRes.json();
+
+          // ===== CALCULATIONS =====
+          const pendingCount = pending.length;
+          const acceptedCount = repeat.length + oneTime.length;
+          const totalCount = pendingCount + acceptedCount;
+          totalGroup=groups.length
+
+          // ===== UPDATE UI =====
+          document.getElementById("m-pending").textContent = pendingCount;
+          document.getElementById("m-accepted").textContent = acceptedCount;
+          document.getElementById("m-total").textContent = totalCount;
+          document.getElementById("m-groups").textContent=totalGroup;
+          document.getElementById("pending-badge").textContent = pendingCount;
+          // badge
+          document.getElementById("dash-pending-badge").textContent =
+            pendingCount + " pending";
+        } catch (err) {
+          console.error("Error loading dashboard:", err);
+        }
+      }
+      async function getPendingDonorsDash() {
+        try {
+          const res = await fetch(
+            "http://localhost:9090/donGroup/pending-donors",
+          );
+          const data = await res.json();
+
+          const tbody = document
+            .getElementById("dash-pending-table")
+            .querySelector("tbody");
+
+          tbody.innerHTML = "";
+
+          data.forEach((donor) => {
+            const tr = document.createElement("tr");
+
+            tr.innerHTML = `
+                    <td><strong>${donor.name}</strong></td>
+                    <td>${donor.bloodType}</td>
+                    <td>${new Date(donor.checkUP).toLocaleDateString()}</td>
+                    <td><span class="badge badge-pending">Pending</span></td>
+                    <td>
+                      <div class="btn-group">
+                        <button class="btn btn-success btn-sm"
+                          onclick="acceptDonor('${donor.id}', '${donor.name}', this)">
+                          Accept
+                        </button>
+                        <button class="btn btn-danger btn-sm"
+                          onclick="rejectDonor('${donor.id}', '${donor.name}', this)">
+                          Reject
+                        </button>
+                      </div>
+                    </td>
+                  `;
+
+            tbody.appendChild(tr);
+          });
+
+          // update metric ONLY once
+          document.getElementById("m-pending").textContent = data.length;
+          document.getElementById("dash-pending-badge").textContent =
+            data.length + " pending";
+        } catch (err) {
+          console.error(err);
+        }
+      }
+
+      // ================= TOAST =================
+      function showToast(message, type = "success") {
+        const container = document.getElementById("toast-container");
+        if (!container) return;
+
+        const toast = document.createElement("div");
+        toast.className = `toast ${type}`;
+        toast.innerText = message;
+
+        container.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+      }
+
+      // ================= LOADER =================
+      function showLoader() {
+        document.getElementById("global-loader")?.classList.remove("hidden");
+      }
+
+      function hideLoader() {
+        document.getElementById("global-loader")?.classList.add("hidden");
+      }
+
+      // ================= RESET BADGES =================
+      function resetDonors() {
+        document.getElementById("donors-pending-badge").textContent =
+          "0 Pending";
+        document.getElementById("donors-accepted-Repeat-badge").textContent =
+          "0 Accepted";
+        document.getElementById("donors-accepted-OneTime-badge").textContent =
+          "0 Accepted";
+      }
+
+      // ================= LOAD ALL =================
+      async function loadDonors() {
+        await refreshAll();
+      }
+
+      async function refreshAll() {
+        resetDonors();
+
+        await Promise.all([
+          getPendingDonors(),
+          getAcceptedRepeatDonors(),
+          getAcceptedOneTimeDonors(),
+          getPendingDonorsDash(),
+          loadDashboardMetrics(),
+          getAllChildren(),
+        ]);
+      }
+
+      // ================= GET PENDING =================
+      async function getPendingDonors() {
+        try {
+          const res = await fetch(
+            "http://localhost:9090/donGroup/pending-donors",
+          );
+          const data = await res.json();
+
+          // ===== TABLE =====
+          const tbody = document.getElementById("donors-pending-tbody");
+
+          tbody.innerHTML = "";
+
+          data.forEach((donor) => {
+            const tr = document.createElement("tr");
+
+            tr.innerHTML = `
+                                <td><strong>${donor.name}</strong></td>
+                                <td>${donor.bloodType}</td>
+                                <td>${donor.donationType}</td>
+                                <td>${new Date(donor.checkUP).toLocaleDateString()}</td>
+                                <td><span class="badge badge-pending">Pending</span></td>
+                                <td>
+                                  <div class="btn-group">
+                                    <button class="btn btn-success btn-sm"
+                                      onclick="acceptDonor('${donor.id}', '${donor.name}', this)">
+                                      Accept
+                                    </button>
+                                    <button class="btn btn-danger btn-sm"
+                                      onclick="rejectDonor('${donor.id}', '${donor.name}', this)">
+                                      Reject
+                                    </button>
+                                  </div>
+                                </td>
+                              `;
+
+            tbody.appendChild(tr);
+          });
+        } catch (err) {
+          console.error("Error fetching pending donors:", err);
+        }
+      }
+      // ================= GET ACCEPTED REPEAT =================
+      async function getAcceptedRepeatDonors() {
+        try {
+          const res = await fetch(
+            "http://localhost:9090/donGroup/acceptedRepeat-donors",
+          );
+          const data = await res.json();
+
+          const tbody = document.querySelector("#t-accepted-repeat-tbody");
+          tbody.innerHTML = "";
+
+          data.forEach((donor) => {
+            const tr = document.createElement("tr");
+
+tr.innerHTML = `
+  <td>${donor.name}</td>
+  <td>${donor.email}</td>
+  <td>${donor.bloodType}</td>
+  <td>${donor.donorstatus}</td>
+  <td>
+    <select onchange="updateDonationType(${donor.id}, this.value)">
+      <option value="REPEAT" ${donor.donationType === "REPEAT" ? "selected" : ""}>REPEAT</option>
+      <option value="ONE_TIME" ${donor.donationType === "ONE_TIME" ? "selected" : ""}>ONE TIME</option>
+    </select>
+  </td>
+
+
+
+  <td>
+    <button onclick="deleteDonor(${donor.id})">Delete</button>
+  </td>
+`;
+            tbody.appendChild(tr);
+          });
+
+          document.getElementById("donors-accepted-Repeat-badge").textContent =
+            data.length + " Accepted";
+        } catch (err) {
+          console.error("Error fetching accepted repeat donors:", err);
+        
+        }
+      }
+
+      // ================= GET ACCEPTED ONE TIME =================
+      async function getAcceptedOneTimeDonors() {
+        try {
+          const res = await fetch(
+            "http://localhost:9090/donGroup/acceptedOneTime-donors",
+          );
+          const data = await res.json();
+
+          const tbody = document.querySelector("#t-accepted-onetime-tbody");
+          tbody.innerHTML = "";
+
+          data.forEach((donor) => {
+            const tr = document.createElement("tr");
+
+tr.innerHTML = `
+  <td>${donor.name}</td>
+  <td>${donor.email}</td>
+  <td>${donor.bloodType}</td>
+
+    <td>${donor.donorstatus}</td>
+  <td>
+    <select onchange="updateDonationType(${donor.id}, this.value)">
+      <option value="REPEAT" ${donor.donationType === "REPEAT" ? "selected" : ""}>REPEAT</option>
+      <option value="ONE_TIME" ${donor.donationType === "ONE_TIME" ? "selected" : ""}>ONE TIME</option>
+    </select>
+  </td>
+
+
+
+  <td>
+    <button onclick="deleteDonor(${donor.id})">Delete</button>
+  </td>
+`;
+            tbody.appendChild(tr);
+          });
+
+          document.getElementById("donors-accepted-OneTime-badge").textContent =
+            data.length + " Accepted";
+        } catch (err) {
+          console.error("Error fetching accepted one-time donors:", err);
+        }
+     
+      }
+
+function updateDonationType(id, type) {
+  fetch(`http://localhost:9090/update-donor-status/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(type)   // ✅ RAW STRING ONLY
+  })
+  .then(res => {
+    if (!res.ok) throw new Error("Update failed");
+    return res.text();
+  })
+  .then(() => {
+    console.log("Donation type updated");
+  })
+  .catch(console.error);
+}
+function deleteDonor(id) {
+  if (!confirm("Are you sure?")) return;
+
+  fetch(`http://localhost:9090/donor/${id}`, {
+    method: "DELETE"
+  }).then(() => loadDonors());
+}
+      // ================= ACCEPT =================
+      async function acceptDonor(id, name, btn) {
+        btn.disabled = true;
+        showLoader();
+
+        try {
+          const res = await fetch(
+            `http://localhost:9090/accept-donor/${id}/${lepId}`,
+            { method: "POST" },
+          );
+
+          if (res.ok) {
+            showToast(`Donor ${name} accepted successfully!`, "success");
+            await refreshAll();
+          } else {
+            showToast(`Failed to accept donor ${name}.`, "error");
+          }
+        } catch (err) {
+          console.error(err);
+          showToast(`Error accepting donor ${name}.`, "error");
+        }
+
+        btn.disabled = false;
+        hideLoader();
+      }
+
+      // ================= REJECT =================
+      async function rejectDonor(id, name, btn) {
+        btn.disabled = true;
+        showLoader();
+
+        try {
+          const res = await fetch(
+            `http://localhost:9090/reject-donor/${id}/${lepId}`,
+            { method: "POST" },
+          );
+
+          if (res.ok) {
+            showToast(`Donor ${name} rejected successfully!`, "success");
+            await refreshAll();
+          } else {
+            showToast(`Failed to reject donor ${name}.`, "error");
+          }
+        } catch (err) {
+          console.error(err);
+          showToast(`Error rejecting donor ${name}.`, "error");
+        }
+
+        btn.disabled = false;
+        hideLoader();
+      }
+
+      // ================= INIT =================
+      loadDonors();
+      getPendingDonorsDash();
+      loadDashboardMetrics();
+      async function getAllChildren() {
+        try {
+          const res = await fetch(`http://localhost:9090/child/${lepId}`);
+          const data = await res.json();
+
+          const container = document.getElementById("child-list");
+          container.innerHTML = "";
+
+          data.forEach((child) => {
+            const card = document.createElement("div");
+            card.className = "child-card";
+
+            // 🔥 IMPORTANT FIX
+            card.setAttribute("data-child-id", child.id);
+
+            card.innerHTML = `
+        <div class="child-card-top">
+          <div class="child-info-row">
+            <div class="child-avatar">${child.name?.[0] || "?"}</div>
+
+            <div>
+              <div class="child-name">${child.name}</div>
+              <div class="child-meta">
+                ${child.age} years old | ${child.bloodType} | ${child.parentNumber}
+              </div>
+            </div>
+          </div>
+
+          <div class="btn-group">
+            <button class="btn btn-info btn-sm"
+              onclick="openEditChild(${child.id})">
+              Edit
+            </button>
+
+            <button class="btn btn-danger btn-sm"
+              onclick="deleteChild('${child.id}')">
+              Delete
+            </button>
+          </div>
+        </div>
+
+        <div class="child-groups">
+          <span class="group-pill">
+            ${child.groupId ? "Group: " + child.groupId : "No Group"}
+          </span>
+        </div>
+      `;
+
+            container.appendChild(card);
+          });
+        } catch (err) {
+          console.error("Error fetching children:", err);
+        }
+      }
+      getAllChildren();
+      async function deleteChild(id) {
+        if (!confirm("Are you sure you want to delete this child?")) return;
+
+        try {
+          const res = await fetch(`http://localhost:9090/child/${id}`, {
+            method: "DELETE",
+          });
+
+          if (res.ok) {
+            showToast("Child deleted successfully", "success");
+            await getAllChildren(); // 🔥 refresh UI
+          } else {
+            showToast("Failed to delete child", "error");
+          }
+        } catch (err) {
+          console.error(err);
+          showToast("Error deleting child", "error");
+        }
+      }
+      async function updateChild() {
+        const id = editChildId;
+
+        if (!id) {
+          showToast("Missing child id", "error");
+          return;
+        }
+
+        const body = {
+          name: document.getElementById("ec-name").value.trim(),
+          age: parseInt(document.getElementById("ec-age").value),
+          bloodType: document.getElementById("ec-blood").value,
+          parentNumber: document
+            .getElementById("ec-parent-number")
+            .value.trim(),
+        };
+
+        try {
+          const res = await fetch(
+            `http://localhost:9090/child/${id}/${lepId}`,
+            {
+              method: "PUT",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(body),
+            },
+          );
+
+          if (res.ok) {
+            showToast("Child updated successfully", "success");
+
+            document
+              .getElementById("edit-child-modal")
+              .classList.remove("open");
+
+            await getAllChildren(); // refresh UI
+          } else {
+            showToast("Failed to update child", "error");
+          }
+        } catch (err) {
+          console.error(err);
+          showToast("Error updating child", "error");
+        }
+      }
+      const pages = {
+        dashboard: "Dashboard",
+        donors: "Donors",
+        children: "Children",
+        groups: "All Groups",
+        "create-group": "Create Group",
+      };
+
+      // Track which group card the "Add Donor" modal was opened from
+      let activeGroupCard = null;
+
+      // // Donors available to add to groups
+      // const allDonors = [
+      //   { name: "Nada Hassan", blood: "A+", initials: "NH" },
+      //   { name: "Youssef Adel", blood: "O+", initials: "YA" },
+      //   { name: "Mariam Samy", blood: "B−", initials: "MS" },
+      //   { name: "Khaled Nour", blood: "A−", initials: "KN" },
+      //   { name: "Dina Rashad", blood: "B+", initials: "DR" },
+      //   { name: "Mahmoud Salah", blood: "O−", initials: "MS" },
+      //   { name: "Rania Ibrahim", blood: "AB−", initials: "RI" },
+      // ];
+
+      // ─── PAGE NAVIGATION ──────────────────────────────────────
+      function showPage(id, el) {
+        document
+          .querySelectorAll(".page")
+          .forEach((p) => p.classList.remove("active"));
+        document
+          .querySelectorAll(".nav-item")
+          .forEach((n) => n.classList.remove("active"));
+        const page = document.getElementById("p-" + id);
+        if (page) page.classList.add("active");
+        if (el) el.classList.add("active");
+        document.getElementById("topbar-title").textContent = pages[id] || id;
+      }
+
+      function switchTab(el, targetId) {
+        const parent = el.closest(".page") || document;
+        parent
+          .querySelectorAll(".tab-btn")
+          .forEach((t) => t.classList.remove("active"));
+        parent
+          .querySelectorAll(".tab-content")
+          .forEach((t) => t.classList.remove("active"));
+        el.classList.add("active");
+        const target = document.getElementById(targetId);
+        if (target) target.classList.add("active");
+      }
+
+      // ─── POPULATE GROUPS IN ADD CHILD MODAL ────────────────────
+      function populateGroupsInAddChildModal() {
+        const groupsList = document.getElementById("ac-groups-list");
+        groupsList.innerHTML = "";
+        const allGroups = document.querySelectorAll(".group-card2");
+
+        if (allGroups.length === 0) {
+          groupsList.innerHTML =
+            '<p style="font-size:12px;color:var(--text3);text-align:center;padding:20px">No groups available yet</p>';
+          return;
+        }
+
+        allGroups.forEach((groupCard, index) => {
+          const title =
+            groupCard.querySelector(".group-card2-title").textContent;
+          const childBadge = groupCard.querySelector(".group-child-badge");
+          const childName = childBadge ? childBadge.textContent : "Unknown";
+
+          const item = document.createElement("div");
+          item.className = "donor-check-item";
+          item.onclick = function () {
+            item.classList.toggle("checked");
+            item.querySelector(".check-box").textContent =
+              item.classList.contains("checked") ? "✓" : "";
+          };
+          item.dataset.groupIndex = index;
+          item.dataset.groupText = `${title} — ${childName}`;
+          item.innerHTML = `
+                                <div class="check-box"></div>
+                                <span class="donor-check-name">${title} — ${childName}</span>
+                              `;
+          groupsList.appendChild(item);
+        });
+      }
+      async function getBloodTypes() {
+        const bloodTypes = await fetch("http://localhost:9090/BloodTypes");
+        bloodTypes.json().then((data) => {
+          const select = document.getElementById("ac-blood");
+
+          data.forEach((bt) => {
+            const option = document.createElement("option");
+            option.value = bt;
+            option.textContent = bt;
+            select.appendChild(option);
+          });
+        });
+      }
+      async function getBloodTypesEdit() {
+        const bloodTypes = await fetch("http://localhost:9090/BloodTypes");
+        bloodTypes.json().then((data) => {
+          const selectE = document.getElementById("ec-blood");
+          data.forEach((bt) => {
+            const option = document.createElement("option");
+            option.value = bt;
+            option.textContent = bt;
+
+            selectE.appendChild(option);
+          });
+        });
+      }
+
+      getBloodTypes();
+      getBloodTypesEdit();
+      // ─── ADD CHILD MODAL ──────────────────────────────────────
+      function openAddChildModal() {
+        document.getElementById("ac-name").value = "";
+        document.getElementById("ac-age").value = "";
+        document.getElementById("ac-blood").value = "";
+
+        document.getElementById("ac-alert").className = "alert";
+        // populateGroupsInAddChildModal();
+        document.getElementById("add-child-modal").classList.add("open");
+      }
+
+      function closeAddChild() {
+        document.getElementById("add-child-modal").classList.remove("open");
+      }
+
+      async function addChild() {
+        const name = document.getElementById("ac-name").value.trim();
+        const age = document.getElementById("ac-age").value.trim();
+        const blood = document.getElementById("ac-blood").value.trim();
+        const phone = document.getElementById("ac-parent-number").value.trim();
+
+        // ===== VALIDATION FIRST =====
+        if (!name || !age || !blood || !phone) {
+          alert("Please fill in all fields.");
+          return;
+        }
+
+        try {
+          const response = await fetch(`http://localhost:9090/child/${lepId}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              name,
+              age: parseInt(age),
+              bloodType: blood,
+              parentNumber: phone,
+            }),
+          });
+
+          if (!response.ok) {
+            alert("Failed to add child");
+            return;
+          }
+
+          const data = await response.json();
+          const childId = data.id;
+
+          // ===== UI =====
+          const initials = name
+            .split(" ")
+            .slice(0, 2)
+            .map((w) => w[0])
+            .join("")
+            .toUpperCase();
+
+          const card = document.createElement("div");
+          card.className = "child-card";
+          card.dataset.childId = childId;
+
+          card.innerHTML = `
+        <div class="child-card-top">
+          <div class="child-info-row">
+            <div class="child-avatar">${initials}</div>
+            <div>
+              <div class="child-name">${name}</div>
+              <div class="child-meta">
+                Age ${age} · Blood type ${blood} · Parent ${phone}
+              </div>
+            </div>
+          </div>
+
+          <div class="btn-group">
+            <button class="btn btn-info btn-sm"
+              onclick="openEditChild('${childId}')">
+              Edit
+            </button>
+
+            <button class="btn btn-danger btn-sm"
+              onclick="deleteChildById(this, '${childId}')">
+              Delete
+            </button>
+          </div>
+        </div>
+
+        <div class="child-groups"></div>
+      `;
+
+          document.getElementById("child-list").appendChild(card);
+
+          closeAddChild();
+        } catch (err) {
+          console.error(err);
+          alert("Error adding child");
+        }
+      }
+      // ─── DELETE CHILD ─────────────────────────────────────────
+      async function deleteChildById(btn, id) {
+        try {
+          const res = await fetch(`http://localhost:9090/child/${id}`, {
+            method: "DELETE",
+          });
+
+          if (res.ok) {
+            btn.closest(".child-card").remove(); // works now
+            showToast("Deleted", "success");
+          }
+        } catch (err) {
+          console.error(err);
+        }
+        
+      }
+      // ─── EDIT CHILD MODAL ─────────────────────────────────────
+      let currentChildCard = null;
+      let editChildId = null;
+
+      function openEditChild(id) {
+        const card = document.querySelector(`[data-child-id="${id}"]`);
+
+        if (!card) {
+          console.error("Child not found:", id);
+          showToast("Child not found", "error");
+          return;
+        }
+
+        editChildId = id;
+
+        const name = card.querySelector(".child-name").textContent;
+        const meta = card.querySelector(".child-meta").textContent;
+
+        // split by "|"
+        const parts = meta.split("|").map((p) => p.trim());
+
+        // parts:
+        // [0] = "20 years old"
+        // [1] = "B_Negative"
+        // [2] = "1271989509"
+
+        const age = parts[0]?.match(/\d+/)?.[0] || "";
+        const blood = parts[1] || "";
+        const phone = parts[2] || "";
+
+        // fill inputs
+        document.getElementById("ec-name").value = name;
+        document.getElementById("ec-age").value = age;
+        document.getElementById("ec-blood").value = blood;
+        // document.getElementById("ec-blood").style;
+        document.getElementById("ec-parent-number").value = phone;
+
+        document.getElementById("edit-child-modal").classList.add("open");
+      }
+      function populateGroupsInEditChildModal(childCard) {
+        const groupsList = document.getElementById("ec-groups-list");
+        groupsList.innerHTML = "";
+
+        // Get current groups for this child
+        const currentGroupPills = childCard.querySelectorAll(".group-pill");
+        const currentGroupTexts = new Set();
+        currentGroupPills.forEach((pill) => {
+          currentGroupTexts.add(pill.textContent.trim());
+        });
+
+        const allGroups = document.querySelectorAll(".group-card2");
+
+        allGroups.forEach((groupCard, index) => {
+          const title =
+            groupCard.querySelector(".group-card2-title").textContent;
+          const childBadge = groupCard.querySelector(".group-child-badge");
+          const childName = childBadge ? childBadge.textContent : "Unknown";
+          const groupText = `${title} — ${childName}`;
+
+          const isChecked = currentGroupTexts.has(groupText);
+
+          const item = document.createElement("div");
+          item.className = "donor-check-item" + (isChecked ? " checked" : "");
+          item.onclick = function () {
+            item.classList.toggle("checked");
+            item.querySelector(".check-box").textContent =
+              item.classList.contains("checked") ? "✓" : "";
+          };
+          item.dataset.groupIndex = index;
+          item.dataset.groupText = groupText;
+          item.innerHTML = `
+                                <div class="check-box">${isChecked ? "✓" : ""}</div>
+                                <span class="donor-check-name">${groupText}</span>
+                              `;
+          groupsList.appendChild(item);
+        });
+      }
+
+      function closeEditChild() {
+        document.getElementById("edit-child-modal").classList.remove("open");
+      }
+
+      function saveChild() {
+        if (!currentChildCard) return;
+
+        const name = document.getElementById("ec-name").value.trim();
+        const age = document.getElementById("ec-age").value.trim();
+        const blood = document.getElementById("ec-blood").value.trim();
+        const selectedGroupItems = Array.from(
+          document.querySelectorAll(
+            "#ec-groups-list .donor-check-item.checked",
+          ),
+        );
+
+        if (!name || !age || !blood) {
+          alert("Please fill in all fields.");
+          return;
+        }
+
+        // Update avatar initials
+        const initials = name
+          .split(" ")
+          .slice(0, 2)
+          .map((w) => w[0])
+          .join("")
+          .toUpperCase();
+        const avatarEl = currentChildCard.querySelector(".child-avatar");
+        if (avatarEl) avatarEl.textContent = initials;
+
+        currentChildCard.querySelector(".child-name").textContent = name;
+
+        // Update meta
+        let groupsText = "";
+        if (selectedGroupItems.length > 0) {
+          groupsText = ` · ${selectedGroupItems.length} assigned group${selectedGroupItems.length !== 1 ? "s" : ""}`;
+        } else {
+          groupsText = " · No groups yet";
+        }
+        currentChildCard.querySelector(".child-meta").textContent =
+          `Age ${age} · Blood type ${blood}${groupsText}`;
+
+        // Update group pills
+        const groupsContainer = currentChildCard.querySelector(".child-groups");
+        groupsContainer.innerHTML = "";
+        if (selectedGroupItems.length > 0) {
+          selectedGroupItems.forEach((item) => {
+            const groupText = item.dataset.groupText;
+            const pill = document.createElement("span");
+            pill.className = "group-pill";
+            pill.textContent = groupText;
+            groupsContainer.appendChild(pill);
+          });
+        } else {
+          groupsContainer.innerHTML =
+            '<span style="font-size:12px;color:var(--text3)">No groups assigned</span>';
+        }
+
+        closeEditChild();
+      }
+
+      // // ─── ACCEPT / REJECT DONOR (Dashboard) ───────────────────
+      // function acceptDonor(btn, name) {
+      //   const row = btn.closest("tr");
+      //   const statusCell = row.querySelector("td:nth-child(4)");
+      //   if (statusCell)
+      //     statusCell.innerHTML =
+      //       '<span class="badge badge-accepted">Accepted</span>';
+      //   btn.closest(".btn-group").innerHTML =
+      //     '<span style="font-size:12px;color:var(--green)">✓ Accepted</span>';
+      //   updatePendingCount(-1);
+      // }
+
+      // function rejectDonor(btn, name) {
+      //   const row = btn.closest("tr");
+      //   row.style.transition = "opacity 0.3s";
+      //   row.style.opacity = "0.4";
+      //   btn.closest(".btn-group").innerHTML =
+      //     '<span style="font-size:12px;color:var(--red)">✕ Rejected</span>';
+      //   updatePendingCount(-1);
+      // }
+
+      // ─── ACCEPT / REJECT DONOR (Donors page list) ─────────────
+      function acceptDonorFromList(btn, name) {
+        const row = btn.closest("tr");
+        row.style.transition = "opacity 0.3s";
+        row.style.opacity = "0";
+        setTimeout(() => row.remove(), 300);
+      }
+
+      function rejectDonorFromList(btn, name) {
+        const row = btn.closest("tr");
+        const blood = row.cells[1].textContent;
+        row.style.transition = "opacity 0.3s";
+        row.style.opacity = "0";
+        setTimeout(() => {
+          row.remove();
+          // Add to rejected table
+          const rejTbody = document.getElementById("donors-rejected-tbody");
+          const today = new Date();
+          const dateStr = today.toLocaleDateString("en-GB", {
+            day: "2-digit",
+            month: "short",
+          });
+          rejTbody.insertAdjacentHTML(
+            "beforeend",
+            `
+                                <tr>
+                                  <td><strong>${name}</strong></td>
+                                  <td style="font-family:'DM Mono',monospace">${blood}</td>
+                                  <td>${dateStr}</td>
+                                  <td>Checkup failed</td>
+                                </tr>
+                              `,
+          );
+          updateRejectedCount(1);
+        }, 300);
+      }
+
+      function updatePendingCount(delta) {
+        const el = document.getElementById("m-pending");
+        if (el) el.textContent = Math.max(0, parseInt(el.textContent) + delta);
+        const badge = document.getElementById("pending-badge");
+        if (badge)
+          badge.textContent = Math.max(0, parseInt(badge.textContent) + delta);
+        const dashBadge = document.getElementById("dash-pending-badge");
+        if (dashBadge) {
+          const n = Math.max(0, parseInt(dashBadge.textContent) + delta);
+          dashBadge.textContent = n + " pending";
+        }
+      }
+
+      function updateRejectedCount(delta) {
+        const badge = document.getElementById("donors-rejected-badge");
+        if (badge) {
+          const n = Math.max(0, parseInt(badge.textContent) + delta);
+          badge.textContent = n + " rejected";
+        }
+      }
+
+      // ─── REMOVE MEMBER ────────────────────────────────────────
+      // function removeMember(btn) {
+      //   const row = btn.closest(".member-row");
+      //   const list = row.closest(".member-list");
+      //   const memberCount = list.querySelectorAll(".member-row").length;
+      //   if (memberCount <= 3) {
+      //     alert("Cannot remove: group must have at least 3 donors.");
+      //     return;
+      //   }
+      //   row.style.transition = "opacity 0.2s";
+      //   row.style.opacity = "0";
+      //   setTimeout(() => {
+      //     row.remove();
+      //     updateGroupFooterCount(list);
+      //   }, 200);
+      // }
+
+      function updateGroupFooterCount(memberList) {
+        const card = memberList.closest(".group-card2");
+        const footer = card.querySelector(".group-member-count");
+        if (footer) {
+          const n = memberList.querySelectorAll(".member-row").length;
+          footer.textContent = n + " donor" + (n !== 1 ? "s" : "");
+        }
+      }
+
+      // ─── ADD DONOR TO GROUP MODAL ─────────────────────────────
+
+
+async function openAddDonorModal(btn, groupId,childId) {
+  const res = await fetch(`${API_BASE}/donGroup/matching-donors/${childId}`);
+  const donors = await res.json();
+
+  const list = document.getElementById("add-donor-list");
+  list.innerHTML = "";
+
+  donors.forEach((d) => {
+    const item = document.createElement("div");
+    item.className = "donor-check-item";
+
+    item.innerHTML = `
+      <div class="check-box"></div>
+      <span class="donor-check-name">${d.name}</span>
+      <span class="donor-check-blood">${d.bloodType || d.blood}</span>
+    `;
+
+    // ✅ CLICK = ADD DONOR TO GROUP
+    item.onclick = async () => {
+      try {
+        const res = await fetch(
+          `${API_BASE}/donGroup/${groupId}/add/${d.id}`,
+          {
+            method: "POST",
+          }
+        );
+      const data=res.json();
+        if (!res.ok) {
+          showToast("must be from 3 to 6 donors","error")
+        }
+
+        showAlert("Donor added successfully!");
+
+        // refresh UI
+        loadGroups();
+
+        // close modal (optional)
+        document.getElementById("add-donor-modal").classList.remove("open");
+      } catch (err) {
+        console.error(err);
+        showAlert(err.message, "error");
+      }
+    };
+
+    list.appendChild(item);
+  });
+
+  document.getElementById("add-donor-modal").classList.add("open");
+}
+      function toggleSingleModal(el) {
+        const alreadyItems = document.querySelectorAll(
+          "#add-donor-list .donor-check-item",
+        );
+        alreadyItems.forEach((e) => {
+          const isAlready = e.querySelector("span[style]");
+          if (e !== el && !isAlready) {
+            e.classList.remove("checked");
+            e.querySelector(".check-box").textContent = "";
+          }
+        });
+        el.classList.toggle("checked");
+        el.querySelector(".check-box").textContent = el.classList.contains(
+          "checked",
+        )
+          ? "✓"
+          : "";
+      }
+
+      function confirmAddDonor() {
+        const alertEl = document.getElementById("add-donor-alert");
+        let selectedItem = null;
+        document
+          .querySelectorAll("#add-donor-list .donor-check-item.checked")
+          .forEach((el) => {
+            if (!el.querySelector('span[style*="color:var(--text3)"]')) {
+              selectedItem = el;
+            }
+          });
+
+        if (!selectedItem) {
+          alertEl.className = "alert alert-error show";
+          alertEl.textContent = "Please select a donor to add.";
+          return;
+        }
+
+        if (!activeGroupCard) return;
+
+        const name = selectedItem.dataset.name;
+        const blood = selectedItem.dataset.blood;
+        const initials = selectedItem.dataset.initials;
+
+        const memberList = activeGroupCard.querySelector(".member-list");
+        const newRow = document.createElement("div");
+        newRow.className = "member-row";
+        newRow.innerHTML = `
+                              <div class="member-info">
+                                <div class="member-avatar">${initials}</div>
+                                <div><div class="member-name">${name}</div><div class="member-blood">${blood}</div></div>
+                              </div>
+                              <button class="btn btn-danger btn-sm" onclick="removeMember(this)">Remove</button>
+                            `;
+        memberList.appendChild(newRow);
+        updateGroupFooterCount(memberList);
+        closeAddDonorModal();
+      }
+
+      function closeAddDonorModal() {
+        document.getElementById("add-donor-modal").classList.remove("open");
+        activeGroupCard = null;
+      }
+
+      // // ─── CREATE GROUP ─────────────────────────────────────────
+      // function createGroup() {
+      //   const childVal = document.getElementById("cg-child").value;
+      //   const alertEl = document.getElementById("cg-alert");
+      //   const checkedItems = document.querySelectorAll(
+      //     "#cg-donor-list .checked",
+      //   );
+      //   const count = checkedItems.length;
+
+      //   alertEl.className = "alert";
+      //   alertEl.textContent = "";
+
+      //   if (!childVal) {
+      //     alertEl.className = "alert alert-error show";
+      //     alertEl.textContent = "Please select a child first.";
+      //     return;
+      //   }
+      //   if (count < 3) {
+      //     alertEl.className = "alert alert-error show";
+      //     alertEl.textContent = "Select at least 3 donors.";
+      //     return;
+      //   }
+      //   if (count > 6) {
+      //     alertEl.className = "alert alert-error show";
+      //     alertEl.textContent = "Maximum 6 donors allowed.";
+      //     return;
+      //   }
+
+      //   // Get child name from the select
+      //   const childSelect = document.getElementById("cg-child");
+      //   const childName = childSelect.options[
+      //     childSelect.selectedIndex
+      //   ].text.replace(/\s*\(.*\)/, "");
+
+      //   // Count existing groups for this child to name the new group
+      //   const existingGroups = document.querySelectorAll(
+      //     `.group-child-badge[data-child="${childVal}"]`,
+      //   );
+      //   const groupNumber = existingGroups.length + 1;
+
+      //   // Build member rows HTML
+      //   let membersHTML = "";
+      //   checkedItems.forEach((item) => {
+      //     const name = item.dataset.name;
+      //     const blood = item.dataset.blood;
+      //     const initials = item.dataset.initials;
+      //     membersHTML += `
+      //                           <div class="member-row">
+      //                             <div class="member-info">
+      //                               <div class="member-avatar">${initials}</div>
+      //                               <div><div class="member-name">${name}</div><div class="member-blood">${blood}</div></div>
+      //                             </div>
+      //                             <button class="btn btn-danger btn-sm" onclick="removeMember(this)">Remove</button>
+      //                           </div>
+      //                         `;
+      //   });
+
+      //   // Build and append new group card
+      //   const newCard = document.createElement("div");
+      //   newCard.className = "group-card2";
+      //   newCard.innerHTML = `
+      //                         <div class="group-card2-header">
+      //                           <div class="group-card2-title">Group ${groupNumber}</div>
+      //                           <span class="group-child-badge" data-child="${childVal}">${childName}</span>
+      //                         </div>
+      //                         <div class="member-list">${membersHTML}</div>
+      //                         <div class="group-card2-footer">
+      //                           <span class="group-member-count">${count} donors</span>
+      //                           <button class="btn btn-success btn-sm" onclick="openAddDonorModal(this)">+ Add Donor</button>
+      //                         </div>
+      //                       `;
+      //   document.getElementById("group-card-list").appendChild(newCard);
+
+      //   // Update groups metric count
+      //   const mGroups = document.getElementById("m-groups");
+      //   if (mGroups) mGroups.textContent = parseInt(mGroups.textContent) + 1;
+
+      //   alertEl.className = "alert alert-success show";
+      //   alertEl.textContent = `Group ${groupNumber} created for ${childName} with ${count} donors!`;
+
+      //   // Reset form after a short delay
+      //   setTimeout(() => {
+      //     document.getElementById("cg-child").value = "";
+      //     document.querySelectorAll("#cg-donor-list .checked").forEach((el) => {
+      //       el.classList.remove("checked");
+      //       el.querySelector(".check-box").textContent = "";
+      //     });
+      //     document.getElementById("cg-count").textContent = "0";
+      //     alertEl.className = "alert";
+      //   }, 2000);
+      // }
+
+      // // ─── TOGGLE CREATE GROUP DONORS ───────────────────────────
+      // function toggleCGDonor(el) {
+      //   const checked = document.querySelectorAll(
+      //     "#cg-donor-list .checked",
+      //   ).length;
+      //   if (!el.classList.contains("checked") && checked >= 6) return;
+      //   el.classList.toggle("checked");
+      //   el.querySelector(".check-box").textContent = el.classList.contains(
+      //     "checked",
+      //   )
+      //     ? "✓"
+      //     : "";
+      //   document.getElementById("cg-count").textContent =
+      //     document.querySelectorAll("#cg-donor-list .checked").length;
+      // }
+
+      // // ─── CLOSE MODALS ON BACKDROP CLICK ──────────────────────
+      // document
+      //   .getElementById("add-donor-modal")
+      //   .addEventListener("click", function (e) {
+      //     if (e.target === this) closeAddDonorModal();
+      //   });
+      // document
+      //   .getElementById("add-child-modal")
+      //   .addEventListener("click", function (e) {
+      //     if (e.target === this) closeAddChild();
+      //   });
+      // document
+      //   .getElementById("edit-child-modal")
+      //   .addEventListener("click", function (e) {
+      //     if (e.target === this) closeEditChild();
+      //   });
+    
+        // const API_BASE = 'http://localhost:9090'; // change to your server URL
+                      // replace with logged-in LEP id
+ 
+    const MIN_DONORS = 3;
+    const MAX_DONORS = 6;
+ 
+    let selectedDonorIds = new Set();
+ 
+    // ── INIT: load children for this LEP ─────────
+    async function init() {
+      const select = document.getElementById('cg-child');
+      try {
+        const res = await fetch(`${API_BASE}/child/unassigned/${lepId}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const children = await res.json();
+ 
+        select.innerHTML = '<option value="">— Choose a child —</option>';
+        children.forEach(c => {
+          const opt = document.createElement('option');
+          opt.value = c.id;
+          opt.textContent = `${c.name} (${c.bloodType ?? ''})`;
+          select.appendChild(opt);
+        });
+      } catch (err) {
+        showAlert('Failed to load children. Please refresh.');
+        console.error(err);
+      }
+    }
+ 
+    // ── Child selected → fetch matching donors ────
+    async function onChildChange() {
+      const childId = document.getElementById('cg-child').value;
+      const list    = document.getElementById('cg-donor-list');
+ 
+      selectedDonorIds.clear();
+      updateCounter();
+      hideAlert();
+ 
+      if (!childId) {
+        list.innerHTML = '';
+        return;
+      }
+ 
+      list.innerHTML = '<div style="padding:12px;color:#888;font-size:14px">Loading donors…</div>';
+ 
+      try {
+        const res = await fetch(`${API_BASE}/donGroup/matching-donors/${childId}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const donors = await res.json();
+        renderDonors(donors);
+      } catch (err) {
+        list.innerHTML = '<div style="padding:12px;color:#c00;font-size:14px">Could not load donors.</div>';
+        console.error(err);
+      }
+    }
+
+    // ── Render donor checkboxes (your original markup) ─
+    function renderDonors(donors) {
+      const list = document.getElementById('cg-donor-list');
+ 
+      if (!donors.length) {
+        list.innerHTML = '<div style="padding:12px;color:#888;font-size:14px">No compatible donors found.</div>';
+        return;
+      }
+ 
+      list.innerHTML = '';
+      donors.forEach(donor => {
+        const initials   = (donor.name || '??').split(' ').map(w => w[0]).join('').toUpperCase().slice(0,2);
+        const donorType  = donor.donationType || donor.type || 'One-time';
+        const badgeClass = donorType.toLowerCase().includes('repeat') ? 'badge-repeat' : 'badge-onetime';
+ 
+        const item = document.createElement('div');
+        item.className        = 'donor-check-item';
+        item.dataset.id       = donor.id;
+        item.dataset.name     = donor.name;
+        item.dataset.blood    = donor.bloodType ?? '';
+        item.dataset.initials = initials;
+        item.onclick          = () => toggleCGDonor(item);
+ 
+        item.innerHTML = `
+          <div class="check-box"></div>
+          <span class="donor-check-name">${esc(donor.name)}</span>
+          <span class="donor-check-blood">${esc(donor.bloodType ?? '')}</span>
+          <span class="badge ${badgeClass}" style="font-size: 10px; margin-left: 6px">${esc(donorType)}</span>
+        `;
+ 
+        list.appendChild(item);
+      });
+    }
+ 
+    // ── Toggle selection (keeps your original function name) ─
+function toggleCGDonor(item) {
+  const id = parseInt(item.dataset.id);
+
+  const isSelected = item.classList.contains("checked");
+
+  // REMOVE
+  if (isSelected) {
+    item.classList.remove("checked");
+    selectedDonorIds.delete(id);
+
+    const box = item.querySelector(".check-box");
+    box.textContent = "";
+  }
+
+  // ADD
+  else {
+    if (selectedDonorIds.size >= MAX_DONORS) {
+      showAlert(`You can select at most ${MAX_DONORS} donors.`);
+      return;
+    }
+
+    item.classList.add("checked");
+    selectedDonorIds.add(id);
+
+    const box = item.querySelector(".check-box");
+    box.textContent = "✓";
+  }
+
+  hideAlert();
+  updateCounter();
+
+  // gray-out logic
+  document.querySelectorAll(".donor-check-item").forEach(el => {
+    if (!el.classList.contains("checked")) {
+      el.style.opacity = selectedDonorIds.size >= MAX_DONORS ? "0.45" : "";
+      el.style.pointerEvents = selectedDonorIds.size >= MAX_DONORS ? "none" : "";
+    } else {
+      el.style.opacity = "";
+      el.style.pointerEvents = "";
+    }
+  });
+}
+    function updateCounter() {
+      document.getElementById('cg-count').textContent = selectedDonorIds.size;
+    }
+ 
+    // ── Submit → POST /donGroup/{childId} ─────────
+    async function createGroup() {
+      const childId = document.getElementById('cg-child').value;
+ 
+      if (!childId) {
+        showAlert('Please select a child first.');
+        return;
+      }
+      // if (selectedDonorIds.size < MIN_DONORS) {
+      //   showAlert(`Please select at least ${MIN_DONORS} donors.`);
+      //   return;
+      // }
+      // if (selectedDonorIds.size > MAX_DONORS) {
+      //   showAlert(`Please select no more than ${MAX_DONORS} donors.`);
+      //   return;
+      // }
+ 
+      try {
+        const res = await fetch(`${API_BASE}/donGroup/${childId}`, {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify([...selectedDonorIds])
+        });
+       var data=res.json();
+        if (!res.ok) {
+          const body = await res.text();
+          throw new Error(body || `Server error: ${res.status}`);
+        }
+ 
+        showAlert('Group created successfully!');
+         window.location.reload();
+  await refreshAll();
+ 
+      } catch (err) {
+        showAlert('Failed to create group: ' + data.message);
+        // console.error(err);
+      }
+    }
+ 
+    // ── Alert helpers ─────────────────────────────
+    function showAlert(msg) {
+      const el = document.getElementById('cg-alert');
+      el.textContent   = msg;
+      el.style.display = 'block';
+    }
+ 
+    function hideAlert() {
+      const el = document.getElementById('cg-alert');
+      el.style.display = 'none';
+      el.textContent   = '';
+    }
+ 
+    function esc(str) {
+      return String(str)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+        .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+ 
+    // ── Start ─────────────────────────────────────
+    // init();
+    window.onload = () => {
+  init();
+  loadGroups();
+};
+
+async function loadGroups() {
+  try {
+    const res = await fetch(`${API_BASE}/donGroup/all/${lepId}`);
+
+    if (!res.ok) {
+      throw new Error("Failed to load groups");
+    }
+
+    const groups = await res.json();
+
+    const container = document.getElementById("group-card-list");
+    container.innerHTML = "";
+
+    if (!groups || groups.length === 0) {
+      container.innerHTML = `<p style="text-align:center;color:gray;">No groups found</p>`;
+      return;
+    }
+
+  groups.forEach((group, index) => {
+      const card = document.createElement("div");
+      card.className = "group-card2";
+
+      card.innerHTML = `
+        <div class="group-card2-header">
+             <div class="group-card2-title">Group ${index + 1}</div>
+          <span class="group-child-badge">${group.child.name}</span>
+        </div>
+
+        <div class="member-list">
+          ${group.donors.map(donor => `
+            <div class="member-row">
+              <div class="member-info">
+                <div class="member-avatar">${getInitials(donor.name)}</div>
+                <div>
+                  <div class="member-name">${donor.name}</div>
+                  <div class="member-blood">${donor.bloodType}</div>
+                </div>
+              </div>
+
+              <button class="btn btn-danger btn-sm"
+                onclick="removeMember(${group.id}, ${donor.id})">
+                Remove
+              </button>
+            </div>
+          `).join("")}
+       <div class="group-card2-footer">
+  <span class="group-member-count">
+    ${group.donorsCount} donors
+  </span>
+  <div style="display:flex;gap:6px">
+  <button class="btn btn-info btn-sm"
+  onclick='openLifecycleModal(${JSON.stringify(group).replace(/'/g,"&#39;")})'>
+  🔄Show Donation Life Cycle
+</button>
+    <button class="btn btn-success btn-sm"
+      onclick="openAddDonorModal(this, ${group.id},${group.child.id})">
+      + Add Donor
+    </button>
+  </div>
+</div>
+      `;
+
+      container.appendChild(card);
+    });
+
+  } catch (err) {
+    console.error(err);
+    alert("Error loading groups");
+  }
+}
+async function removeMember(groupId, donorId) {
+  try {
+    const res = await fetch(
+      `${API_BASE}/donGroup/${groupId}/remove/${donorId}`,
+      {
+        method: "POST"
+      }
+    );
+
+    if (!res.ok) {
+      let errorMessage = "Failed to remove donor";
+
+      try {
+        const errorData = await res.json();
+        errorMessage = errorData.message || errorMessage;
+      } catch {
+        errorMessage = await res.text();
+      }
+
+      throw new Error(errorMessage);
+    }
+
+    showAlert("Donor removed successfully!");
+
+    // refresh UI
+    loadGroups();
+
+  } catch (err) {
+    console.error(err);
+    showToast(err.message, "error");
+  }
+}
+
+function getInitials(name) {
+  if (!name || typeof name !== "string") return "";
+
+  return name
+    .trim()
+    .split(" ")
+    .filter(n => n.length > 0)
+    .map(n => n[0])
+    .join("")
+    .toUpperCase();
+}
+loadGroups();
+   </script>
+  </body>
+</html>

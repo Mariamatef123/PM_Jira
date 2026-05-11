@@ -1,0 +1,110 @@
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #f4f6f9;
+}
+
+.container {
+  display: flex;
+}
+
+/* Sidebar */
+.sidebar {
+  width: 220px;
+  height: 100vh;
+  background: #2c3e50;
+  color: white;
+  padding: 20px;
+}
+
+.sidebar h2 {
+  margin-bottom: 20px;
+  border-bottom: 1px solid #34495e;
+  padding-bottom: 12px;
+}
+
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar li {
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background 0.2s;
+}
+
+.sidebar li:hover,
+.sidebar .active {
+  background: #34495e;
+}
+
+/* Main */
+.main {
+  flex: 1;
+  padding: 30px;
+}
+
+/* Cards */
+.cards {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px 24px;
+  width: 170px;
+  border: 0.5px solid #e0e0e0;
+  position: relative;
+  overflow: hidden;
+}
+
+.card-label {
+  font-size: 12px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.card-value {
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.card-sub {
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+.card.blue  .card-value { color: #2980b9; }
+.card.green .card-value { color: #27ae60; }
+.card.orange .card-value { color: #e67e22; }
+
+.card-bar {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+}
+
+.card.blue   .card-bar { background: #3498db; }
+.card.green  .card-bar { background: #2ecc71; }
+.card.orange .card-bar { background: #f39c12; }
+
+/* Status badges */
+.status-row { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+
+.badge {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.badge.pending  { background: #fff3cd; color: #856404; }
+.badge.approved { background: #d1f0e0; color: #1a6e3f; }
+.badge.rejected { background: #f8d7da; color: #842029; }

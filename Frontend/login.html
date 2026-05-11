@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <title>تسجيل الدخول - شريان العطاء</title>
+    <link rel="stylesheet" href="CSS/style.css" />
+    <style>
+      .content-box {
+        max-width: 400px;
+        text-align: center;
+        margin: 80px auto;
+        padding: 30px;
+        border: 1px solid #eee;
+        border-radius: 15px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+      }
+      input {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        box-sizing: border-box;
+      }
+      .btn-submit-step {
+        width: 100%;
+        padding: 12px;
+        background-color: #c62828;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 16px;
+        font-weight: bold;
+        transition: background 0.3s;
+      }
+      .btn-submit-step:hover {
+        background-color: #b71c1c;
+      }
+
+      .alert-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.45);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 0;
+        transition: opacity 0.25s;
+        pointer-events: none;
+      }
+      .alert-overlay.show {
+        opacity: 1;
+        pointer-events: all;
+      }
+      .alert-box {
+        background: white;
+        border-radius: 16px;
+        padding: 2rem 2rem 1.5rem;
+        width: 90%;
+        max-width: 340px;
+        text-align: center;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        transform: scale(0.85);
+        transition: transform 0.25s;
+      }
+      .alert-overlay.show .alert-box {
+        transform: scale(1);
+      }
+
+      .alert-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+        font-size: 30px;
+      }
+      .alert-icon.success {
+        background: #eaf3de;
+        color: #3b6d11;
+      }
+      .alert-icon.error {
+        background: #fcebeb;
+        color: #a32d2d;
+      }
+
+      .alert-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: #1a1a1a;
+      }
+      .alert-message {
+        font-size: 14px;
+        color: #666;
+        margin-bottom: 1.5rem;
+        line-height: 1.6;
+      }
+      .alert-btn {
+        width: 100%;
+        padding: 11px;
+        border: none;
+        border-radius: 8px;
+        font-size: 15px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: opacity 0.2s;
+        color: white;
+      }
+      .alert-btn:hover {
+        opacity: 0.85;
+      }
+      .alert-btn.success {
+        background: #c62828;
+      }
+      .alert-btn.error {
+        background: #a32d2d;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar">
+      <div class="logo-container">
+        <img src="Images/logo.jpg" style="height: 50px" alt="Logo" />
+      </div>
+      <a href="index.html" class="nav-item">الرئيسية</a>
+    </nav>
+
+    <div class="content-box">
+      <h3 style="margin-bottom: 25px; color: #333">تسجيل الدخول</h3>
+
+      <form id="loginForm" onsubmit="login(event)">
+        <input
+          type="email"
+          id="userEmail"
+          placeholder="البريد الإلكتروني"
+          required
+        />
+        <input
+          type="password"
+          id="userPassword"
+          placeholder="الرقم السري"
+          required
+        />
+        <p style="color: #b71c1c; display: none" id="errorMessage"></p>
+        <button type="submit" class="btn-submit-step">دخول</button>
+      </form>
+    </div>
+
+    <div class="alert-overlay" id="alertOverlay">
+      <div class="alert-box">
+        <div class="alert-icon" id="alertIcon"></div>
+        <div class="alert-title" id="alertTitle"></div>
+        <div class="alert-message" id="alertMessage"></div>
+        <button class="alert-btn" id="alertBtn" onclick="closeAlert()"></button>
+      </div>
+    </div>
+
+    <script>
+      let alertCallback = null;
+      let timerInterval = null;
+      let isBlocked = false;
+
+      function showAlert(type, title, message, btnText, callback) {
+        document.getElementById("alertIcon").className = "alert-icon " + type;
+        document.getElementById("alertIcon").textContent =
+          type === "success" ? "✓" : "✕";
+        document.getElementById("alertTitle").textContent = title;
+        document.getElementById("alertMessage").textContent = message;
+        document.getElementById("alertBtn").textContent = btnText;
+        document.getElementById("alertBtn").className = "alert-btn " + type;
+
+        alertCallback = callback || null;
+        document.getElementById("alertOverlay").classList.add("show");
+      }
+
+      function closeAlert() {
+        document.getElementById("alertOverlay").classList.remove("show");
+        if (alertCallback) {
+          alertCallback();
+          alertCallback = null;
+        }
+      }
+
+      async function login(e) {
+        e.preventDefault();
+
+        const email = document.getElementById("userEmail").value;
+        const password = document.getElementById("userPassword").value;
+
+        const savedEmail = localStorage.getItem("blockedEmail");
+
+        if (isBlocked) {
+          showAlert(
+            "error",
+            "محظور",
+            "لا يمكنك تسجيل الدخول حالياً. انتظر انتهاء الوقت.",
+            "حسناً",
+          );
+          return;
+        }
+
+        if (savedEmail && email !== savedEmail) {
+          showAlert(
+            "error",
+            "محظور",
+            "تم حظر هذا الجهاز مؤقتاً، لا يمكنك تغيير الحساب الآن.",
+            "حسناً",
+          );
+          return;
+        }
+
+        try {
+          const response = await fetch("http://localhost:9090/login", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ officialEmail: email, password }),
+          });
+
+          const data = await response.json().catch(() => null);
+
+          const user = {
+            id: data?.id,
+            name: data?.name,
+            email: data?.email,
+            role: data?.role,
+            phone: data?.phone,
+          };
+
+          localStorage.setItem("user", JSON.stringify(user));
+
+          if (response.ok) {
+            clearBlockStorage();
+
+            showAlert("success", "نجاح", "تم تسجيل الدخول", "OK", () => {
+              const id = user.id;
+
+              if (user.role === "HR_ADMIN") {
+                window.location.href = `hrAdmin.html?hrId=${id}`;
+              } else if (user.role === "PR_ADMIN") {
+                window.location.href = `prAdmin.html?prId=${id}`;
+              } else if (user.role === "HR_MEMBER") {
+                window.location.href = `hrMember.html?hrId=${id}`;
+              } else if (user.role === "PR_MEMBER") {
+                window.location.href = `prMember.html?prId=${id}`;
+              } else if (user.role === "LEP") {
+                window.location.href = `lep.html?lepId=${id}`;
+              }
+            });
+
+            return;
+          }
+
+          if (response.status === 429) {
+            showAlert("error", "محظور", await response.text(), "حسناً");
+
+            localStorage.setItem("isBlocked", "true");
+            localStorage.setItem("blockedEmail", email);
+
+            startBackendTimer(email);
+            return;
+          }
+
+          errorMessage.style.display = "block";
+          showAlert("error", "خطأ", await response.text(), "حاول مجدداً");
+        } catch (error) {
+          showAlert("error", "خطأ", "تعذر الاتصال بالسيرفر", "إغلاق");
+        }
+      }
+
+      function startBackendTimer(email) {
+        const errorMessage = document.getElementById("errorMessage");
+        const button = document.querySelector(".btn-submit-step");
+
+        button.disabled = true;
+
+        if (timerInterval) clearInterval(timerInterval);
+
+        timerInterval = setInterval(async () => {
+          try {
+            const res = await fetch(
+              `http://localhost:9090/login/block-time-seconds?email=${email}`,
+            );
+
+            if (!res.ok) throw new Error("Server error");
+
+            const totalSeconds = await res.json();
+
+            if (totalSeconds <= 0) {
+              clearInterval(timerInterval);
+
+              isBlocked = false;
+              button.disabled = false;
+              errorMessage.textContent = "";
+
+              clearBlockStorage();
+              return;
+            }
+
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+
+            isBlocked = true;
+
+            errorMessage.style.display = "block";
+            errorMessage.textContent = ` تم الحظر مؤقتاً - المتبقي: ${minutes}:${seconds
+              .toString()
+              .padStart(2, "0")}`;
+          } catch (err) {
+            errorMessage.style.display = "block";
+            errorMessage.textContent = " تعذر الاتصال بالسيرفر...";
+          }
+        }, 1000);
+      }
+
+      function clearBlockStorage() {
+        localStorage.removeItem("isBlocked");
+        localStorage.removeItem("blockedEmail");
+      }
+
+      window.onload = function () {
+        const savedBlocked = localStorage.getItem("isBlocked");
+        const email = localStorage.getItem("blockedEmail");
+
+        if (savedBlocked === "true" && email) {
+          isBlocked = true;
+          startBackendTimer(email);
+        }
+      };
+    </script>
+  </body>
+</html>
